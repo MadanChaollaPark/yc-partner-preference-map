@@ -369,3 +369,65 @@ function App() {
                   <h2>{selectedPartner.name}</h2>
                   <p>
                     {selectedPartner.role}
+                    {selectedPartner.alumniCompany ? ` · ${selectedPartner.alumniCompany}` : ''}
+                  </p>
+                </div>
+                <StatusBadge confidence={selectedPartner.preferences.confidence} />
+              </div>
+              <p className="bio">{selectedPartner.bio || 'No public bio is loaded yet.'}</p>
+              <div className="agent-line">
+                <Bot size={16} aria-hidden="true" />
+                <span>{selectedPartner.agent.id}</span>
+                <strong>{selectedPartner.agent.status}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="insight-grid">
+            <InsightBlock title="Preference Thesis" items={selectedPartner.preferences.thesis} />
+            <BarBlock title="Top Tags" items={selectedPartner.preferences.topTags} />
+            <BarBlock title="Industries" items={selectedPartner.preferences.topIndustries} />
+            <BarBlock title="Founder Signals" items={selectedPartner.preferences.founderSignals} />
+          </div>
+
+          {selectedPartner.signals.length > 0 ? (
+            <section className="signal-band">
+              <div className="section-title">
+                <Info size={17} aria-hidden="true" />
+                <h3>Visiting or Historical Signals</h3>
+              </div>
+              <div className="signal-list">
+                {selectedPartner.signals.map((signal) => (
+                  <a
+                    href={signal.sourceUrl}
+                    key={`${signal.label}-${signal.sourceUrl}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <strong>{signal.type}</strong>
+                    <span>{signal.label}</span>
+                    <p>{signal.text}</p>
+                  </a>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="company-section">
+            <div className="company-heading">
+              <div>
+                <h3>Attributed Companies</h3>
+                <p>
+                  {selectedCompanies.length} of {selectedPartner.companies.length} public
+                  primary-partner records
+                </p>
+              </div>
+              <label className="search-box compact">
+                <Search size={15} aria-hidden="true" />
+                <input
+                  value={companyQuery}
+                  onChange={(event) => setCompanyQuery(event.target.value)}
+                  placeholder="Filter companies or founders"
+                />
+              </label>
+            </div>
