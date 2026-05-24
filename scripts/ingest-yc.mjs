@@ -892,3 +892,103 @@ function buildPartnerProfiles({ currentPartners, visitingPartners, companies }) 
   }
 
   for (const company of companies) {
+    if (!company.primaryPartner?.name) continue
+    const partnerKey = slugify(company.primaryPartner.name)
+    const partner = byName.get(partnerKey)
+    if (!partner) {
+      byName.set(partnerKey, {
+        id: slugify(company.primaryPartner.name),
+        name: company.primaryPartner.name,
+        role: 'Primary Group Partner',
+        category: 'attributed',
+        bio: '',
+        photo: company.primaryPartner.avatarUrl,
+        url: company.primaryPartner.url,
+        alumniCompany: null,
+        sourceUrl: company.sourceUrl,
+        signals: [],
+        companies: [],
+        agent: agentFor(company.primaryPartner.name, 'primary-partner'),
+      })
+    }
+    byName.get(partnerKey).companies.push(summarizeCompany(company))
+  }
+
+  return [...byName.values()]
+    .map((partner) => ({
+      ...partner,
+      preferences: summarizePreferences(partner.companies, partner.bio, partner.signals),
+    }))
+    .sort((a, b) => {
+      const categoryRank = { current: 0, attributed: 1, visiting: 2 }
+      return (
+        (categoryRank[a.category] ?? 3) - (categoryRank[b.category] ?? 3) ||
+        b.companies.length - a.companies.length ||
+        a.name.localeCompare(b.name)
+      )
+    })
+}
+
+function summarizeCompany(company) {
+  return {
+    slug: company.slug,
+    name: company.name,
+    oneLiner: company.oneLiner,
+    batch: company.batch,
+    status: company.status,
+    stage: company.stage,
+    teamSize: company.teamSize,
+    location: company.location,
+    tags: company.tags,
+    industries: company.industries,
+    founders: company.founders,
+    formerNames: company.formerNames,
+    pivotSignals: company.pivotSignals.slice(0, 4),
+    url: company.url,
+  }
+}
+
+function summarizePreferences(companies, bio, signals) {
+  const tags = countTop(companies.flatMap((company) => company.tags), 8)
+  const industries = countTop(companies.flatMap((company) => company.industries), 8)
+  const locations = countTop(
+    companies
+      .map((company) => normalizeLocation(company.location))
+      .filter(Boolean),
+    6,
+  )
+  const founderTerms = countTop(
+    companies.flatMap((company) =>
+      company.founders.flatMap((founder) => tokenizeFounderBio(founder.bio)),
+    ),
+    8,
+  )
+
+  return {
+    investmentCount: companies.length,
+    topTags: tags,
+    topIndustries: industries,
+    topLocations: locations,
+    founderSignals: founderTerms,
+    thesis: buildThesis({ companies, bio, signals, tags, industries, founderTerms }),
+    confidence:
+      companies.length >= 20 ? 'strong' : companies.length >= 5 ? 'directional' : 'thin',
+  }
+}
+
+function buildThesis({ companies, bio, signals, tags, industries, founderTerms }) {
+  const phrases = []
+  const topIndustry = industries[0]?.label
+  const topTag = tags[0]?.label
+  const topFounderSignal = founderTerms[0]?.label
+
+  if (topIndustry || topTag) {
+    phrases.push(
+      `Public primary-partner data clusters around ${[
+        topIndustry,
+        topTag,
+      ].filter(Boolean).join(' / ')}.`,
+    )
+  }
+
+  if (topFounderSignal) {
