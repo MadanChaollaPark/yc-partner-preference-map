@@ -463,3 +463,96 @@
 
 .bar-track {
   height: 8px;
+  background: #e7edf0;
+}
+
+.bar-track div {
+  height: 100%;
+  background: var(--teal);
+}
+
+.signal-band,
+.company-section,
+.sources-section {
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.section-title {
+  justify-content: flex-start;
+  margin-bottom: 12px;
+}
+
+.section-title h3,
+.company-heading h3 {
+  font-size: 18px;
+}
+
+.signal-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.signal-list a,
+.source-grid a {
+  display: block;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--panel);
+}
+
+.signal-list strong,
+.source-grid strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.signal-list span,
+.source-grid span {
+  color: var(--yc);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.signal-list p,
+.source-grid p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.company-heading {
+  align-items: flex-end;
+}
+
+.company-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.company-row {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.company-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 15px;
+}
+
+.company-main a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-weight: 900;
+  font-size: 17px;
