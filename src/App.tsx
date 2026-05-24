@@ -493,3 +493,65 @@ function Metric({
 }
 
 function Avatar({ partner, large = false }: { partner: Partner; large?: boolean }) {
+  return partner.photo ? (
+    <img
+      className={large ? 'avatar large' : 'avatar'}
+      src={partner.photo}
+      alt=""
+      loading="lazy"
+    />
+  ) : (
+    <span className={large ? 'avatar initials large' : 'avatar initials'}>
+      {partner.name
+        .split(' ')
+        .map((part) => part[0])
+        .join('')
+        .slice(0, 2)}
+    </span>
+  )
+}
+
+function StatusBadge({ confidence }: { confidence: Partner['preferences']['confidence'] }) {
+  return <span className={`status-badge ${confidence}`}>{confidence}</span>
+}
+
+function InsightBlock({ title, items }: { title: string; items: string[] }) {
+  return (
+    <section className="insight-block">
+      <h3>{title}</h3>
+      {items.length ? (
+        <ul>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="muted">No thesis generated yet.</p>
+      )}
+    </section>
+  )
+}
+
+function BarBlock({ title, items }: { title: string; items: CountItem[] }) {
+  const max = Math.max(...items.map((item) => item.value), 1)
+  return (
+    <section className="insight-block">
+      <h3>{title}</h3>
+      {items.length ? (
+        <div className="bar-list">
+          {items.slice(0, 6).map((item) => (
+            <div className="bar-row" key={item.label}>
+              <span>{item.label}</span>
+              <div className="bar-track">
+                <div style={{ width: `${Math.max((item.value / max) * 100, 8)}%` }} />
+              </div>
+              <strong>{item.value}</strong>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="muted">Not enough records yet.</p>
+      )}
+    </section>
+  )
+}
