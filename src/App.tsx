@@ -245,3 +245,65 @@ function App() {
       <section className="metrics-strip" aria-label="Dataset coverage">
         <Metric
           icon={<Database size={18} />}
+          label="YC index"
+          value={formatNumber(data.coverage.allYcCompanyRecords)}
+        />
+        <Metric
+          icon={<Building2 size={18} />}
+          label="Fetched pages"
+          value={formatNumber(data.coverage.companyPagesFetched)}
+        />
+        <Metric
+          icon={<CheckCircle2 size={18} />}
+          label="Partner attributions"
+          value={formatNumber(data.coverage.companiesWithPrimaryPartner)}
+        />
+        <Metric
+          icon={<Users size={18} />}
+          label="Agents tracked"
+          value={formatNumber(data.partners.length)}
+        />
+      </section>
+
+      <section className="notice" aria-label="Data caveat">
+        <AlertTriangle size={18} aria-hidden="true" />
+        <span>{data.coverage.caveat}</span>
+      </section>
+
+      <section className="workspace">
+        <aside className="partner-panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Agents</h2>
+              <p>
+                {filteredPartners.length} profiles · {data.coverage.historicalPartnersSeeded}{' '}
+                historical seeds
+              </p>
+            </div>
+            <Bot size={20} aria-hidden="true" />
+          </div>
+
+          <label className="search-box">
+            <Search size={16} aria-hidden="true" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search partner, domain, founder signal"
+            />
+          </label>
+
+          <div className="filter-group" aria-label="Partner category">
+            {Object.keys(categoryLabels).map((key) => (
+              <button
+                className={category === key ? 'active' : ''}
+                key={key}
+                type="button"
+                onClick={() => setCategory(key)}
+              >
+                {categoryLabels[key]}
+              </button>
+            ))}
+          </div>
+
+          <div className="select-row">
+            <label>
