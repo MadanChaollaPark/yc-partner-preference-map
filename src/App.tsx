@@ -183,3 +183,65 @@ function App() {
         }
         return b.companies.length - a.companies.length || a.name.localeCompare(b.name)
       })
+  }, [category, confidence, query, sortBy])
+
+  const selectedPartner =
+    filteredPartners.find((partner) => partner.id === selectedId) ??
+    filteredPartners[0] ??
+    data.partners[0]
+
+  const selectedCompanies = useMemo(() => {
+    const normalizedQuery = companyQuery.trim().toLowerCase()
+    if (!selectedPartner) return []
+    return selectedPartner.companies.filter((company) => {
+      const searchable = [
+        company.name,
+        company.oneLiner,
+        company.batch,
+        company.location,
+        ...company.tags,
+        ...company.industries,
+        ...company.founders.map((founder) => `${founder.name} ${founder.bio}`),
+      ]
+        .join(' ')
+        .toLowerCase()
+      return !normalizedQuery || searchable.includes(normalizedQuery)
+    })
+  }, [companyQuery, selectedPartner])
+
+  const topSourceKinds = useMemo(
+    () =>
+      data.sources.reduce<Record<string, number>>((counts, source) => {
+        counts[source.kind] = (counts[source.kind] ?? 0) + 1
+        return counts
+      }, {}),
+    [],
+  )
+
+  if (!selectedPartner) {
+    return <main className="empty-state">No partner data loaded.</main>
+  }
+
+  return (
+    <main className="app-shell">
+      <header className="topbar">
+        <div className="brand-mark">Y</div>
+        <div>
+          <p className="eyebrow">YC Partner Preference Map</p>
+          <h1>Partner signals from public YC data</h1>
+        </div>
+        <a
+          className="source-link"
+          href="https://www.ycombinator.com/companies"
+          target="_blank"
+          rel="noreferrer"
+          title="Open YC company directory"
+        >
+          <ExternalLink size={16} aria-hidden="true" />
+          YC Directory
+        </a>
+      </header>
+
+      <section className="metrics-strip" aria-label="Dataset coverage">
+        <Metric
+          icon={<Database size={18} />}
