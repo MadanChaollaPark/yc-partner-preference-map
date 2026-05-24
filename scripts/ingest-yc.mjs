@@ -1091,3 +1091,102 @@ function tokenizeFounderBio(bio) {
   return terms
     .filter(([, needles]) => needles.some((needle) => lower.includes(needle)))
     .map(([label]) => label)
+}
+
+function normalizeLocation(location) {
+  if (!location) return ''
+  const first = location.split(';')[0].split(',').map((part) => part.trim())
+  if (first.length >= 2) return first.slice(-2).join(', ')
+  return first[0]
+}
+
+function normalizeArray(value) {
+  if (!Array.isArray(value)) return []
+  return value.map((item) => decodeText(item)).filter(Boolean)
+}
+
+function decodeText(input) {
+  return decodeHtml(String(input ?? '')).replace(/\s+/g, ' ').trim()
+}
+
+function stripMarkdown(input) {
+  return input
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[*_`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function inferAlumniCompany(bio) {
+  const match = bio.match(/(?:co-?founder|founded|founder).*?(?:of|at)\s+([A-Z][^,.()]+)/i)
+  return match ? match[1].trim() : null
+}
+
+function compact(text) {
+  return decodeText(text).slice(0, 280)
+}
+
+function yearFromBatch(batch) {
+  const match = String(batch ?? '').match(/(20\d{2})/)
+  return match ? Number(match[1]) : null
+}
+
+function slugify(input) {
+  return String(input)
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+}
+
+function toAbsolute(url) {
+  if (!url) return null
+  if (url.startsWith('http')) return url
+  return `https://www.ycombinator.com${url}`
+}
+
+function normalizeUrl(url) {
+  if (!url) return null
+  if (url.startsWith('//')) return `https:${url}`
+  return url
+}
+
+function uniqueBy(items, keyFn) {
+  const seen = new Set()
+  const result = []
+  for (const item of items) {
+    const key = keyFn(item)
+    if (seen.has(key)) continue
+    seen.add(key)
+    result.push(item)
+  }
+  return result
+}
+
+function agentFor(name, kind) {
+  return {
+    id: `${slugify(name)}-${kind}-agent`,
+    owner: name,
+    status: 'ready',
+    task:
+      'Collect sourced company attributions, founder bios, company facts, pivot signals, and preference summaries.',
+  }
+}
+
+async function mapPool(items, poolSize, mapper) {
+  const results = new Array(items.length)
+  let cursor = 0
+  const workers = Array.from(
+    { length: Math.min(poolSize, items.length) },
+    async () => {
+      while (cursor < items.length) {
+        const current = cursor
+        cursor += 1
+        results[current] = await mapper(items[current], current)
+      }
+    },
+  )
+  await Promise.all(workers)
+  return results
+}
