@@ -58,3 +58,66 @@ type Signal = {
   sourceUrl: string
   text: string
 }
+
+type Partner = {
+  id: string
+  name: string
+  role: string
+  category: string
+  bio: string
+  photo: string | null
+  url: string | null
+  alumniCompany: string | null
+  sourceUrl: string
+  signals: Signal[]
+  companies: Company[]
+  agent: {
+    id: string
+    owner: string
+    status: string
+    task: string
+  }
+  preferences: {
+    investmentCount: number
+    topTags: CountItem[]
+    topIndustries: CountItem[]
+    topLocations: CountItem[]
+    founderSignals: CountItem[]
+    thesis: string[]
+    confidence: 'strong' | 'directional' | 'thin'
+  }
+}
+
+type Dataset = {
+  generatedAt: string
+  coverage: {
+    allYcCompanyRecords: number
+    companyPagesFetched: number
+    companiesWithPrimaryPartner: number
+    partnersFromYcPeoplePage: number
+    visitingPartnersSeeded: number
+    historicalPartnersSeeded: number
+    caveat: string
+  }
+  sources: {
+    label: string
+    url: string
+    kind: string
+    note: string
+  }[]
+  partners: Partner[]
+  companies: Company[]
+}
+
+const data = rawData as Dataset
+
+const categoryLabels: Record<string, string> = {
+  all: 'All',
+  current: 'Current',
+  visiting: 'Visiting',
+  historical: 'Historical',
+  attributed: 'Attributed',
+}
+
+const confidenceLabels: Record<string, string> = {
+  all: 'All confidence',
