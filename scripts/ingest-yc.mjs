@@ -495,3 +495,102 @@ const HISTORICAL_PARTNERS = [
     batch: 'W22 Visiting Group Partner',
     bio: 'Jamglue (YC S06) and Rickshaw (YC W14) founder.',
     sourceUrl: 'https://www.ycombinator.com/blog/welcome-surbhi-nicolas-divya-ashu-and-tom',
+    confidence: 'high',
+  },
+  {
+    name: 'Ashu Desai',
+    role: 'Former Visiting Group Partner',
+    batch: 'W22 Visiting Group Partner',
+    bio: 'Make School co-founder; education company background.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-surbhi-nicolas-divya-ashu-and-tom',
+    confidence: 'medium',
+  },
+  {
+    name: 'Edrizio De La Cruz',
+    role: 'Former Visiting Group Partner',
+    batch: 'announced November 2022',
+    bio: 'Arcus co-founder (YC W13); fintech/LatAm company acquired by Mastercard.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-diana-dave-edrizio-and-umur',
+    confidence: 'medium',
+  },
+  {
+    name: 'Umur Cubukcu',
+    role: 'Former Visiting Group Partner',
+    batch: 'announced November 2022; returning in 2023',
+    bio: 'Citus Data co-founder/CEO (YC S11), acquired by Microsoft.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-diana-dave-edrizio-and-umur',
+    confidence: 'medium',
+  },
+  {
+    name: 'Nate Smith',
+    role: 'Former Visiting Group Partner',
+    batch: 'announced October 2023',
+    bio: 'Lever co-founder/CEO/CTO (YC S12), acquired by Employ; Google PM background.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/meet-ycs-newest-group-partner-and-visiting-group-partners',
+    confidence: 'high',
+  },
+  {
+    name: 'Ooshma Garg',
+    role: 'Former Visiting Group Partner',
+    batch: 'S24 Visiting Group Partner',
+    bio: 'Gobble founder/CEO (YC W14), acquired by Intelligent Brands.',
+    sourceUrl: 'https://www.ycombinator.com/blog/meet-ycs-newest-visiting-group-partners',
+    confidence: 'high',
+  },
+]
+
+const args = parseArgs(process.argv.slice(2))
+const limit = toNumber(args.limit, Number.POSITIVE_INFINITY)
+const concurrency = toNumber(args.concurrency, 10)
+const onlyAttributed = args['only-attributed'] === true
+const recentBatches = args['recent-batches'] === true
+
+await mkdir(DATA_DIR, { recursive: true })
+await mkdir(CACHE_DIR, { recursive: true })
+
+const [peoplePage, partnersPage, allCompanies] = await Promise.all([
+  fetchPageData(SOURCES.ycPeople),
+  fetchPageData(SOURCES.ycPartners),
+  fetchJson(SOURCES.ycCompanies),
+])
+
+const people = extractPeople(peoplePage)
+const currentPartners = extractCurrentPartners(people, partnersPage)
+const companiesToFetch = selectCompanies(allCompanies, { limit, recentBatches })
+
+console.log(
+  `Fetching ${companiesToFetch.length} company pages with concurrency ${concurrency}...`,
+)
+
+const scraped = await mapPool(companiesToFetch, concurrency, async (company, index) => {
+  if ((index + 1) % 50 === 0) {
+    console.log(`  ${index + 1}/${companiesToFetch.length}`)
+  }
+  return scrapeCompany(company)
+})
+
+const enrichedCompanies = scraped.filter(Boolean)
+const attributedCompanies = enrichedCompanies.filter(
+  (company) => company.primaryPartner?.name,
+)
+const companiesForAnalysis = onlyAttributed ? attributedCompanies : enrichedCompanies
+const partnerProfiles = buildPartnerProfiles({
+  currentPartners,
+  visitingPartners: VISITING_PARTNERS,
+  companies: companiesForAnalysis,
+})
+
+const output = {
+  generatedAt: new Date().toISOString(),
+  coverage: {
+    allYcCompanyRecords: allCompanies.length,
+    companyPagesFetched: enrichedCompanies.length,
+    companiesWithPrimaryPartner: attributedCompanies.length,
+    partnersFromYcPeoplePage: currentPartners.length,
+    visitingPartnersSeeded: VISITING_PARTNERS.length,
+    historicalPartnersSeeded: HISTORICAL_PARTNERS.length,
+    caveat:
+      'YC company pages expose primary group partner consistently for recent batches and sparsely for older companies. This dataset treats that as public attribution, not a complete investment ledger.',
+  },
+  sources: [
