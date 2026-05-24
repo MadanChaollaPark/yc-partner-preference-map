@@ -395,3 +395,103 @@ const HISTORICAL_PARTNERS = [
     confidence: 'high',
   },
   {
+    name: 'Sharon Pope',
+    role: 'Former part-time partner',
+    batch: 'announced March 2016',
+    bio: 'Green Dot CMO and former Loopt marketing/communications leader.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-x11',
+    confidence: 'high',
+  },
+  {
+    name: 'Immad Akhund',
+    role: 'Former part-time partner',
+    batch: 'W17 part-time partner',
+    bio: 'Heyzap (YC W09) and Clickpass (YC S07) founder.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-aaron-gustaf-lyle-immad-and-marcus',
+    confidence: 'high',
+  },
+  {
+    name: 'Marcus Segal',
+    role: 'Former part-time partner',
+    batch: 'W17 part-time partner',
+    bio: 'Former Zynga SVP Global Operations, Vindicia CFO, and eMusic COO.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-aaron-gustaf-lyle-immad-and-marcus',
+    confidence: 'high',
+  },
+  {
+    name: 'Lyle Fong',
+    role: 'Former Visiting Partner',
+    batch: 'W17 Visiting Partner',
+    bio: 'Lithium Technologies founder and Hobo Labs founder/CEO.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-aaron-gustaf-lyle-immad-and-marcus',
+    confidence: 'high',
+  },
+  {
+    name: 'Eric Migicovsky',
+    role: 'Former Partner',
+    batch: 'Partner announced February 2018',
+    bio: 'Pebble Technology (YC W11) founder, acquired by Fitbit.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-eric-holly-diego-matt-nic-kyle-adele-jose-matt-ramon-and-gia/',
+    confidence: 'high',
+  },
+  {
+    name: 'Holly Liu',
+    role: 'Former Visiting Partner',
+    batch: 'Visiting Partner announced February 2018',
+    bio: 'Kabam founder with gaming, product, and people operations background.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-eric-holly-diego-matt-nic-kyle-adele-jose-matt-ramon-and-gia/',
+    confidence: 'high',
+  },
+  {
+    name: 'Diego Rey',
+    role: 'Former Visiting Partner',
+    batch: 'Visiting Partner announced February 2018',
+    bio: 'GeneWEAVE co-founder/CTO, acquired by Roche.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-eric-holly-diego-matt-nic-kyle-adele-jose-matt-ramon-and-gia/',
+    confidence: 'high',
+  },
+  {
+    name: 'Solomon Hykes',
+    role: 'Former Visiting Partner',
+    batch: 'W19 Visiting Partner',
+    bio: 'Docker/dotCloud (YC S10) founder; containers and cloud infrastructure.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-elizabeth-lindsay-aaron-kevin-solomon-holly-mia-casey-sachin-rachel-and-janelle',
+    confidence: 'high',
+  },
+  {
+    name: 'Tracy Young',
+    role: 'Former Visiting Group Partner',
+    batch: 'W21 Visiting Group Partner',
+    bio: 'PlanGrid co-founder/CEO (YC W12), acquired by Autodesk.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-w21-visiting-group-partners/',
+    confidence: 'high',
+  },
+  {
+    name: 'Reshma Khilnani',
+    role: 'Former Visiting Group Partner',
+    batch: 'W21 and S21 Visiting Group Partner',
+    bio: 'MedXT co-founder/CTO (YC 2013) and Droplet/Kit co-founder.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-w21-visiting-group-partners/',
+    confidence: 'high',
+  },
+  {
+    name: 'Ralph Gootee',
+    role: 'Former Visiting Group Partner',
+    batch: 'W21 Visiting Group Partner',
+    bio: 'PlanGrid co-founder/CTO (YC W12), acquired by Autodesk.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-w21-visiting-group-partners/',
+    confidence: 'high',
+  },
+  {
+    name: 'Divya Bhat',
+    role: 'Former Visiting Group Partner',
+    batch: 'W22 Visiting Group Partner',
+    bio: 'Jamglue (YC S06) and Rickshaw (YC W14) founder.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-surbhi-nicolas-divya-ashu-and-tom',
