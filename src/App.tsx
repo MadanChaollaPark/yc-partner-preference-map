@@ -307,3 +307,65 @@ function App() {
 
           <div className="select-row">
             <label>
+              <SlidersHorizontal size={15} aria-hidden="true" />
+              <select
+                value={confidence}
+                onChange={(event) => setConfidence(event.target.value)}
+                aria-label="Confidence filter"
+              >
+                {Object.keys(confidenceLabels).map((key) => (
+                  <option key={key} value={key}>
+                    {confidenceLabels[key]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <ArrowDownUp size={15} aria-hidden="true" />
+              <select
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value)}
+                aria-label="Sort partners"
+              >
+                {Object.keys(sortLabels).map((key) => (
+                  <option key={key} value={key}>
+                    {sortLabels[key]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="partner-list" role="list">
+            {filteredPartners.map((partner) => (
+              <button
+                className={selectedPartner.id === partner.id ? 'partner-row active' : 'partner-row'}
+                key={partner.id}
+                type="button"
+                onClick={() => {
+                  setSelectedId(partner.id)
+                  setCompanyQuery('')
+                }}
+              >
+                <Avatar partner={partner} />
+                <span className="partner-row-main">
+                  <span className="partner-row-name">{partner.name}</span>
+                  <span className="partner-row-meta">
+                    {partner.role} · {partner.companies.length} companies
+                  </span>
+                </span>
+                <span className={`confidence-dot ${partner.preferences.confidence}`} />
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <section className="detail-panel">
+          <div className="profile-header">
+            <Avatar partner={selectedPartner} large />
+            <div className="profile-main">
+              <div className="profile-title-row">
+                <div>
+                  <h2>{selectedPartner.name}</h2>
+                  <p>
+                    {selectedPartner.role}
