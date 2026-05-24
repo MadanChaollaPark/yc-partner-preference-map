@@ -992,3 +992,102 @@ function buildThesis({ companies, bio, signals, tags, industries, founderTerms }
   }
 
   if (topFounderSignal) {
+    phrases.push(`Founder bios frequently mention ${topFounderSignal}.`)
+  }
+
+  const prior = inferDomainFromText([bio, ...signals.map((signal) => signal.text)].join(' '))
+  if (prior) {
+    phrases.push(`Partner background adds a ${prior} lens.`)
+  }
+
+  if (!companies.length) {
+    phrases.push(
+      'No public primary-partner company attributions were found in the fetched sample yet.',
+    )
+  }
+
+  return phrases
+}
+
+function inferDomainFromText(text) {
+  const lower = text.toLowerCase()
+  const domains = [
+    ['fintech', ['payments', 'banking', 'financial', 'fintech', 'robo-advisor']],
+    ['developer tools', ['developer', 'infrastructure', 'api', 'search', 'data']],
+    ['growth and marketplaces', ['growth', 'marketplace', 'consumer', 'sales']],
+    ['AI and hard technical', ['machine learning', 'ai ', 'computer vision', 'robotics']],
+    ['health and bio', ['biotech', 'drug', 'health', 'life sciences']],
+    ['education', ['education', 'learning', 'students']],
+  ]
+  return domains.find(([, terms]) => terms.some((term) => lower.includes(term)))?.[0]
+}
+
+function countTop(items, limitCount) {
+  const counts = new Map()
+  for (const item of items) {
+    const label = decodeText(item ?? '').trim()
+    if (!label) continue
+    counts.set(label, (counts.get(label) ?? 0) + 1)
+  }
+  return [...counts.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
+    .slice(0, limitCount)
+}
+
+function inferPivotSignals(indexCompany, company, founders) {
+  const signals = []
+  const formerNames = indexCompany.former_names ?? []
+  if (formerNames.length) {
+    signals.push({
+      label: 'Former name',
+      text: `Formerly ${formerNames.slice(0, 4).join(', ')}`,
+      sourceUrl: indexCompany.url,
+    })
+  }
+
+  const text = `${company.long_description ?? ''} ${indexCompany.long_description ?? ''}`
+  const pivotTerms = ['pivot', 'formerly', 'originally', 'started as', 'began as']
+  for (const term of pivotTerms) {
+    const index = text.toLowerCase().indexOf(term)
+    if (index === -1) continue
+    signals.push({
+      label: 'Narrative signal',
+      text: compact(text.slice(Math.max(0, index - 80), index + 220)),
+      sourceUrl: company.ycdc_url ?? indexCompany.url,
+    })
+    break
+  }
+
+  for (const founder of founders) {
+    if (!founder.bio) continue
+    const lower = founder.bio.toLowerCase()
+    if (!pivotTerms.some((term) => lower.includes(term))) continue
+    signals.push({
+      label: 'Founder bio signal',
+      text: compact(founder.bio),
+      sourceUrl: company.ycdc_url ?? indexCompany.url,
+    })
+    break
+  }
+
+  return signals.slice(0, 4)
+}
+
+function tokenizeFounderBio(bio) {
+  const lower = bio.toLowerCase()
+  const terms = [
+    ['ex-google', ['google']],
+    ['ex-meta', ['meta', 'facebook']],
+    ['stanford', ['stanford']],
+    ['mit', ['mit']],
+    ['harvard', ['harvard']],
+    ['phd/research', ['phd', 'researcher', 'research']],
+    ['repeat founder', ['founder', 'co-founder', 'cofounder']],
+    ['open source', ['open source']],
+    ['ai/ml', ['ai', 'machine learning', 'deep learning', 'ml']],
+    ['finance', ['finance', 'bank', 'payments', 'private equity']],
+  ]
+  return terms
+    .filter(([, needles]) => needles.some((needle) => lower.includes(needle)))
+    .map(([label]) => label)
