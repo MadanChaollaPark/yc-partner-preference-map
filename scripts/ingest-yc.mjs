@@ -296,3 +296,102 @@ const HISTORICAL_PARTNERS = [
     batch: 'Joined March 2016; left April 2022',
     bio: 'Imagine K12 partner, Yahoo first employee/CPO, and QuestBridge CEO.',
     sourceUrl: 'https://www.ycombinator.com/blog/tim-brady-is-leaving-yc/',
+    confidence: 'high',
+  },
+  {
+    name: 'Qasar Younis',
+    role: 'Former part-time partner; full-time partner; COO',
+    batch: 'part-time 2013; full-time 2014; COO August 2015',
+    bio: 'TalkBin (YC W11) founder; Google Maps business products background.',
+    sourceUrl: 'https://www.ycombinator.com/blog/a-new-role-for-qasar',
+    confidence: 'high',
+  },
+  {
+    name: 'Steve Huffman',
+    role: 'Former part-time partner',
+    batch: 'announced May 2013',
+    bio: 'Co-founder of Reddit (YC S05) and Hipmunk (YC S10).',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-kevin-michael-steve-dalton-and-andrew',
+    confidence: 'high',
+  },
+  {
+    name: 'Andrew Mason',
+    role: 'Former part-time partner',
+    batch: 'announced May 2013',
+    bio: 'Co-founder and former CEO of Groupon.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-kevin-michael-steve-dalton-and-andrew',
+    confidence: 'high',
+  },
+  {
+    name: 'Emmett Shear',
+    role: 'Former part-time partner; Visiting Group Partner',
+    batch: 'part-time by 2013; Visiting Group Partner announced May 2023',
+    bio: 'Co-founder of Justin.tv/Twitch (YC W07), acquired by Amazon.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-back-to-yc-emmett-shear-and-wayne-crosby',
+    confidence: 'high',
+  },
+  {
+    name: 'Yuri Sagalov',
+    role: 'Former part-time partner',
+    batch: 'joined September 2013; former partner 2014-2019 per YC company profile',
+    bio: 'AeroFS (YC S10) founder; enterprise software and investing background.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-kat-yuri-patrick-and-elizabeth/',
+    confidence: 'high',
+  },
+  {
+    name: 'Patrick Collison',
+    role: 'Former part-time partner',
+    batch: 'announced April 2014',
+    bio: 'Stripe co-founder/CEO and Auctomatic co-founder.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-kat-yuri-patrick-and-elizabeth/',
+    confidence: 'high',
+  },
+  {
+    name: 'Elizabeth Iorns',
+    role: 'Former part-time partner / YC Partner',
+    batch: 'announced April 2014',
+    bio: 'Science Exchange co-founder/CEO; cancer biology PhD; life sciences focus.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-kat-yuri-patrick-and-elizabeth/',
+    confidence: 'high',
+  },
+  {
+    name: 'Peter Thiel',
+    role: 'Former part-time partner; no longer affiliated',
+    batch: 'joined March 2015',
+    bio: 'PayPal, Palantir, Founders Fund, and first outside Facebook investor.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-peter/',
+    confidence: 'high',
+  },
+  {
+    name: 'Adora Cheung',
+    role: 'Former Partner',
+    batch: 'Partner announced June 2016',
+    bio: 'Homejoy co-founder/CEO; former Slide PM.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-adora-nicole-elizabeth-case-and-robby',
+    confidence: 'high',
+  },
+  {
+    name: 'Robby Walker',
+    role: 'Former part-time partner; nonprofit program lead',
+    batch: 'announced June 2016',
+    bio: 'Zenter (YC W07), Cue (YC W10), and Apple/Siri background.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-adora-nicole-elizabeth-case-and-robby',
+    confidence: 'high',
+  },
+  {
+    name: 'Bill Clerico',
+    role: 'Former part-time partner',
+    batch: 'announced March 2016',
+    bio: 'WePay co-founder/CEO (YC S09).',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-x11',
+    confidence: 'high',
+  },
+  {
