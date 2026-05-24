@@ -431,3 +431,65 @@ function App() {
                 />
               </label>
             </div>
+
+            <div className="company-list">
+              {selectedCompanies.slice(0, 24).map((company) => (
+                <CompanyRow company={company} key={company.slug} />
+              ))}
+              {selectedCompanies.length === 0 ? (
+                <div className="empty-inline">No companies match this filter.</div>
+              ) : null}
+            </div>
+          </section>
+
+          <section className="sources-section">
+            <div className="section-title">
+              <LinkIcon size={17} aria-hidden="true" />
+              <h3>Source Mix</h3>
+            </div>
+            <div className="source-grid">
+              {data.sources.slice(0, 8).map((source) => (
+                <a href={source.url} key={source.url} target="_blank" rel="noreferrer">
+                  <span>{source.kind}</span>
+                  <strong>{source.label}</strong>
+                  <p>{source.note}</p>
+                </a>
+              ))}
+            </div>
+            <p className="source-summary">
+              Official sources: {topSourceKinds.official ?? 0}; community sources:{' '}
+              {topSourceKinds.community ?? 0}. Generated{' '}
+              {new Intl.DateTimeFormat(undefined, {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              }).format(new Date(data.generatedAt))}
+              .
+            </p>
+          </section>
+        </section>
+      </section>
+    </main>
+  )
+}
+
+function Metric({
+  icon,
+  label,
+  value,
+}: {
+  icon: ReactNode
+  label: string
+  value: string
+}) {
+  return (
+    <div className="metric">
+      <span>{icon}</span>
+      <div>
+        <strong>{value}</strong>
+        <p>{label}</p>
+      </div>
+    </div>
+  )
+}
+
+function Avatar({ partner, large = false }: { partner: Partner; large?: boolean }) {
