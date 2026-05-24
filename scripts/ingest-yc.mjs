@@ -594,3 +594,102 @@ const output = {
       'YC company pages expose primary group partner consistently for recent batches and sparsely for older companies. This dataset treats that as public attribution, not a complete investment ledger.',
   },
   sources: [
+    {
+      label: 'YC People',
+      url: SOURCES.ycPeople,
+      kind: 'official',
+      note: 'Current YC team biographies and roles.',
+    },
+    {
+      label: 'YC Partners',
+      url: SOURCES.ycPartners,
+      kind: 'official',
+      note: 'Current YC partner roster and short bios.',
+    },
+    {
+      label: 'YC company pages',
+      url: 'https://www.ycombinator.com/companies',
+      kind: 'official',
+      note: 'Embedded company page data includes founders and primary_group_partner when public.',
+    },
+    {
+      label: 'yc-oss company API',
+      url: SOURCES.ycOssRepo,
+      kind: 'community',
+      note:
+        'Unofficial daily mirror of YC company directory metadata, used as the crawl index.',
+    },
+    ...uniqueBy(
+      [...VISITING_PARTNERS, ...HISTORICAL_PARTNERS].map((partner) => ({
+        label: `${partner.batch} ${partner.role}`,
+        url: partner.sourceUrl,
+        kind: 'official',
+        note: `Source for ${partner.name}.`,
+      })),
+      (source) => source.url,
+    ),
+  ],
+  partners: partnerProfiles,
+  companies: attributedCompanies,
+}
+
+await writeFile(OUT_FILE, `${JSON.stringify(output, null, 2)}\n`)
+console.log(`Wrote ${path.relative(ROOT, OUT_FILE)}`)
+
+function parseArgs(argv) {
+  const parsed = {}
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = argv[index]
+    if (!token.startsWith('--')) continue
+    const key = token.slice(2)
+    const next = argv[index + 1]
+    if (!next || next.startsWith('--')) {
+      parsed[key] = true
+    } else {
+      parsed[key] = next
+      index += 1
+    }
+  }
+  return parsed
+}
+
+function toNumber(value, fallback) {
+  if (value === undefined || value === true) return fallback
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+async function fetchJson(url) {
+  const response = await fetch(url, { headers: { 'user-agent': userAgent() } })
+  if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  return response.json()
+}
+
+async function fetchPageData(url) {
+  const html = await fetchText(url)
+  const match = html.match(/data-page="([^"]+)"/)
+  if (!match) throw new Error(`Could not find data-page in ${url}`)
+  return JSON.parse(decodeHtml(match[1]))
+}
+
+async function fetchText(url) {
+  const response = await fetch(url, { headers: { 'user-agent': userAgent() } })
+  if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  return response.text()
+}
+
+function userAgent() {
+  return 'yc-partner-preferences-local-research/1.0'
+}
+
+function decodeHtml(input) {
+  return input
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&#x27;', "'")
+    .replaceAll('&amp;', '&')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+}
+
+function extractPeople(page) {
