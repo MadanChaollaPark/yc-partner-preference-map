@@ -793,3 +793,102 @@ function normalizeCompany(indexCompany, company) {
     ),
     batch: company.batch_name ?? indexCompany.batch,
     yearFounded: company.year_founded ?? yearFromBatch(indexCompany.batch),
+    status: company.ycdc_status ?? indexCompany.status,
+    stage: indexCompany.stage ?? null,
+    teamSize: company.team_size ?? indexCompany.team_size ?? null,
+    location: company.location ?? indexCompany.all_locations ?? '',
+    website: company.website ?? indexCompany.website ?? null,
+    url: company.ycdc_url ?? indexCompany.url,
+    tags: normalizeArray(company.tags?.length ? company.tags : indexCompany.tags),
+    industries: normalizeArray(indexCompany.industries),
+    primaryPartner: primary
+      ? {
+          name: primary.full_name,
+          url: primary.ycdc_url ?? toAbsolute(`/people/${slugify(primary.full_name)}`),
+          avatarUrl: primary.avatar_thumb_url ?? null,
+        }
+      : null,
+    founders,
+    formerNames,
+    pivotSignals,
+    sourceUrl: company.ycdc_url ?? indexCompany.url,
+  }
+}
+
+function buildPartnerProfiles({ currentPartners, visitingPartners, companies }) {
+  const byName = new Map()
+  for (const partner of currentPartners) {
+    byName.set(slugify(partner.name), {
+      ...partner,
+      signals: [],
+      companies: [],
+      agent: agentFor(partner.name, 'current-partner'),
+    })
+  }
+
+  for (const partner of visitingPartners) {
+    const existing = byName.get(slugify(partner.name))
+    if (existing) {
+      existing.signals.push({
+        type: partner.role,
+        label: partner.batch,
+        sourceUrl: partner.sourceUrl,
+        text: partner.bio,
+      })
+      continue
+    }
+
+    byName.set(slugify(partner.name), {
+      id: slugify(partner.name),
+      name: partner.name,
+      role: partner.role,
+      category: 'visiting',
+      bio: partner.bio,
+      photo: null,
+      url: null,
+      alumniCompany: null,
+      sourceUrl: partner.sourceUrl,
+      signals: [
+        {
+          type: partner.role,
+          label: partner.batch,
+          sourceUrl: partner.sourceUrl,
+          text: partner.bio,
+        },
+      ],
+      companies: [],
+      agent: agentFor(partner.name, 'visiting-partner'),
+    })
+  }
+
+  for (const partner of HISTORICAL_PARTNERS) {
+    const existing = byName.get(slugify(partner.name))
+    const signal = {
+      type: partner.role,
+      label: partner.batch,
+      sourceUrl: partner.sourceUrl,
+      text: `${partner.bio} Confidence: ${partner.confidence}.`,
+    }
+
+    if (existing) {
+      existing.signals.push(signal)
+      continue
+    }
+
+      byName.set(slugify(partner.name), {
+      id: slugify(partner.name),
+      name: partner.name,
+      role: partner.role,
+      category: 'historical',
+      bio: partner.bio,
+      photo: null,
+      url: null,
+      alumniCompany: null,
+      sourceUrl: partner.sourceUrl,
+      signals: [signal],
+      companies: [],
+      agent: agentFor(partner.name, 'historical-partner'),
+    })
+  }
+
+  for (const company of companies) {
