@@ -91,3 +91,96 @@
 .metric > span {
   display: grid;
   place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  color: var(--yc);
+  background: var(--soft-orange);
+}
+
+.metric strong {
+  display: block;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.metric p,
+.panel-heading p,
+.company-heading p,
+.source-summary,
+.profile-main p,
+.company-row p,
+.muted {
+  margin: 0;
+  color: var(--muted);
+}
+
+.notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 12px 28px 0;
+  padding: 12px 14px;
+  border: 1px solid #e8d2a8;
+  color: #6b4d13;
+  background: #fff8ea;
+  font-size: 14px;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 370px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 28px 32px;
+}
+
+.partner-panel,
+.detail-panel {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.partner-panel {
+  align-self: start;
+  position: sticky;
+  top: 92px;
+  max-height: calc(100vh - 116px);
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-heading,
+.profile-header,
+.company-heading,
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.panel-heading {
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-heading h2,
+.profile-main h2 {
+  font-size: 22px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  margin: 14px 18px 0;
+  padding: 0 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--muted);
+}
+
+.search-box input {
