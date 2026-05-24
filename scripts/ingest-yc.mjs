@@ -693,3 +693,103 @@ function decodeHtml(input) {
 }
 
 function extractPeople(page) {
+  return page.props.sections.flatMap((section) =>
+    section.people.map((person) => ({
+      ...person,
+      section: decodeText(section.title),
+      url: person.url ? toAbsolute(person.url) : null,
+      photo: person.photo ? normalizeUrl(person.photo) : null,
+      bio: person.bio ? stripMarkdown(decodeText(person.bio)) : '',
+    })),
+  )
+}
+
+function extractCurrentPartners(people, partnersPage) {
+  const officialCards = new Map(
+    (partnersPage.props.partners ?? []).map((partner) => [
+      partner.name,
+      {
+        alumniCompany: partner.title,
+        partnerCardBio: decodeText(partner.bio),
+        partnerCardPhoto: normalizeUrl(partner.photo),
+      },
+    ]),
+  )
+
+  return people
+    .filter(
+      (person) =>
+        person.section === 'President & CEO' || person.section === 'Partners',
+    )
+    .map((person) => {
+      const card = officialCards.get(person.name)
+      return {
+        id: slugify(person.name),
+        name: person.name,
+        role: person.title,
+        category: 'current',
+        bio: person.bio,
+        photo: person.photo ?? card?.partnerCardPhoto ?? null,
+        url: person.url,
+        alumniCompany: card?.alumniCompany ?? inferAlumniCompany(person.bio),
+        sourceUrl: SOURCES.ycPeople,
+      }
+    })
+}
+
+function selectCompanies(companies, options) {
+  const recentBatchNames = new Set([
+    'Winter 2026',
+    'Summer 2025',
+    'Spring 2025',
+    'Winter 2025',
+    'Fall 2024',
+    'Summer 2024',
+  ])
+  const selected = options.recentBatches
+    ? companies.filter((company) => recentBatchNames.has(company.batch))
+    : companies
+  return selected.slice(0, options.limit)
+}
+
+async function scrapeCompany(indexCompany) {
+  const cacheFile = path.join(CACHE_DIR, `${indexCompany.slug}.json`)
+  if (existsSync(cacheFile)) {
+    return JSON.parse(await readFile(cacheFile, 'utf8'))
+  }
+
+  try {
+    const page = await fetchPageData(indexCompany.url)
+    const company = page.props.company
+    const scraped = normalizeCompany(indexCompany, company)
+    await writeFile(cacheFile, JSON.stringify(scraped))
+    return scraped
+  } catch (error) {
+    console.warn(`Failed ${indexCompany.slug}: ${error.message}`)
+    return null
+  }
+}
+
+function normalizeCompany(indexCompany, company) {
+  const primary = company.primary_group_partner
+  const founders = (company.founders ?? []).map((founder) => ({
+    name: founder.full_name,
+    title: founder.title ?? '',
+    bio: decodeText(founder.bio ?? ''),
+    linkedinUrl: founder.linkedin_url ?? null,
+    twitterUrl: founder.twitter_url ?? null,
+  }))
+
+  const formerNames = indexCompany.former_names ?? []
+  const pivotSignals = inferPivotSignals(indexCompany, company, founders)
+
+  return {
+    id: company.id ?? indexCompany.id,
+    slug: company.slug ?? indexCompany.slug,
+    name: company.name ?? indexCompany.name,
+    oneLiner: decodeText(company.one_liner ?? indexCompany.one_liner ?? ''),
+    longDescription: decodeText(
+      company.long_description ?? indexCompany.long_description ?? '',
+    ),
+    batch: company.batch_name ?? indexCompany.batch,
+    yearFounded: company.year_founded ?? yearFromBatch(indexCompany.batch),
