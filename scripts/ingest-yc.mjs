@@ -97,3 +97,102 @@ const VISITING_PARTNERS = [
   {
     name: 'Diana Hu',
     role: 'Visiting Group Partner',
+    batch: 'S21',
+    bio:
+      'Co-founder and CTO of Escher Reality (YC S17), an augmented reality backend acquired by Niantic.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-s21-visiting-group-partners',
+  },
+  {
+    name: 'Calvin French-Owen',
+    role: 'Visiting Group Partner',
+    batch: 'S21',
+    bio:
+      'Co-founder and CTO of Segment, acquired by Twilio; focused on developer tools, enterprise software, and data infrastructure.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-s21-visiting-group-partners',
+  },
+  {
+    name: 'JJ Fliegelman',
+    role: 'Visiting Group Partner',
+    batch: 'S22',
+    bio:
+      'Co-founder and CTO of WayUp (YC W15), a DEI recruiting platform used by millions.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-s22-visiting-group-partners',
+  },
+  {
+    name: 'Liz Wessel',
+    role: 'Visiting Group Partner',
+    batch: 'S22',
+    bio:
+      'Co-founder and CEO of WayUp (YC W15), a diversity and inclusion recruiting platform.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-s22-visiting-group-partners',
+  },
+  {
+    name: 'Pete Koomen',
+    role: 'Visiting Group Partner',
+    batch: 'S22',
+    bio:
+      'Co-founder of Optimizely (YC W10), which grew to $100M+ ARR before acquisition.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-s22-visiting-group-partners',
+  },
+  {
+    name: 'Puneet Kumar',
+    role: 'Visiting Group Partner',
+    batch: 'S22',
+    bio:
+      'Founder and CEO of Supr Daily (YC W17), a consumer grocery startup in India acquired by Swiggy.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-s22-visiting-group-partners',
+  },
+  {
+    name: 'Rich Aberman',
+    role: 'Visiting Group Partner',
+    batch: 'S22',
+    bio:
+      'Co-founder of WePay (YC S09), a payments API company acquired by JPMorgan Chase.',
+    sourceUrl: 'https://www.ycombinator.com/blog/welcome-s22-visiting-group-partners',
+  },
+  {
+    name: 'Emmett Shear',
+    role: 'Visiting Group Partner',
+    batch: '2023',
+    bio: 'Co-founder and CEO of Twitch.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-back-to-yc-emmett-shear-and-wayne-crosby',
+  },
+  {
+    name: 'Wayne Crosby',
+    role: 'Visiting Group Partner',
+    batch: '2023',
+    bio: 'Co-founder of Zenter and 500px; returned to YC as a Visiting Group Partner in 2023.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-back-to-yc-emmett-shear-and-wayne-crosby',
+  },
+  {
+    name: 'Aaron Epstein',
+    role: 'Visiting Partner',
+    batch: 'W19',
+    bio:
+      'Co-founder of Creative Market (YC W10), acquired by Autodesk and later spun out independently.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-elizabeth-lindsay-aaron-kevin-solomon-holly-mia-casey-sachin-rachel-and-janelle',
+  },
+  {
+    name: 'Kevin Hale',
+    role: 'Visiting Partner',
+    batch: 'W19',
+    bio: 'Co-founder of Wufoo (YC W06), acquired by SurveyMonkey.',
+    sourceUrl:
+      'https://www.ycombinator.com/blog/welcome-elizabeth-lindsay-aaron-kevin-solomon-holly-mia-casey-sachin-rachel-and-janelle',
+  },
+]
+
+const HISTORICAL_PARTNERS = [
+  {
+    name: 'Sam Altman',
+    role: 'Former YC President; earlier part-time partner',
+    batch: 'part-time by 2013; President 2014-2019',
+    bio: 'Loopt (YC S05) founder and later OpenAI CEO.',
+    sourceUrl: 'https://www.ycombinator.com/blog/sam-altman-for-president/',
+    confidence: 'high',
+  },
+  {
+    name: 'Michael Seibel',
