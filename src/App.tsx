@@ -555,3 +555,64 @@ function BarBlock({ title, items }: { title: string; items: CountItem[] }) {
     </section>
   )
 }
+
+function CompanyRow({ company }: { company: Company }) {
+  const founderBios = company.founders.filter((founder) => founder.bio)
+  return (
+    <article className="company-row">
+      <div className="company-main">
+        <div>
+          <a href={company.url} target="_blank" rel="noreferrer">
+            {company.name}
+            <ExternalLink size={14} aria-hidden="true" />
+          </a>
+          <p>{company.oneLiner}</p>
+        </div>
+        <div className="company-tags">
+          {uniqueStrings([...company.industries, ...company.tags])
+            .slice(0, 5)
+            .map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
+        </div>
+      </div>
+      <div className="company-meta">
+        <span>{company.batch}</span>
+        <span>{company.status}</span>
+        <span>{company.location || 'Location n/a'}</span>
+        <span>{company.teamSize ? `${company.teamSize} people` : 'Team n/a'}</span>
+      </div>
+      <div className="founder-strip">
+        {company.founders.slice(0, 4).map((founder) => (
+          <div key={`${company.slug}-${founder.name}`}>
+            <strong>{founder.name}</strong>
+            <span>{founder.title || 'Founder'}</span>
+            {founder.bio ? <p>{founder.bio}</p> : null}
+          </div>
+        ))}
+      </div>
+      {company.pivotSignals.length || company.formerNames.length ? (
+        <div className="pivot-strip">
+          {company.formerNames.length ? (
+            <span>Formerly {company.formerNames.join(', ')}</span>
+          ) : null}
+          {company.pivotSignals.slice(0, 4).map((pivot) => (
+            <span key={`${pivot.label}-${pivot.text}`}>{pivot.text}</span>
+          ))}
+        </div>
+      ) : founderBios.length === 0 ? (
+        <div className="pivot-strip quiet">Founder bios are not public on this record.</div>
+      ) : null}
+    </article>
+  )
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat().format(value)
+}
+
+function uniqueStrings(items: string[]) {
+  return [...new Set(items.filter(Boolean))]
+}
+
+export default App
