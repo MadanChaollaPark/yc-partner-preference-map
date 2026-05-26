@@ -1,0 +1,21 @@
+Vedawiki military-drone hero photo sources
+
+Option 1: Reaper over terrain
+Source: U.S. Air Force / Wikimedia Commons
+URL: https://commons.wikimedia.org/wiki/File:MQ-9_Reaper_UAV.jpg
+Local file: /stock/war-drone-reaper-flight.jpg
+
+Option 2: Preflight check
+Source: U.S. Air National Guard / Wikimedia Commons
+URL: https://commons.wikimedia.org/wiki/File:MQ-9_Reaper_unmanned_aerial_vehicle.jpg
+Local file: /stock/war-drone-reaper-ground.jpg
+
+Option 3: FPV field test
+Source: U.S. Army / Wikimedia Commons
+URL: https://commons.wikimedia.org/wiki/File:First_person_view_drone_in_flight_(8285124).jpg
+Local file: /stock/war-drone-fpv-flight.jpg
+
+Option 4: Micro air vehicle
+Source: U.S. Navy / Wikimedia Commons
+URL: https://commons.wikimedia.org/wiki/File:MicroAirVehicle.jpg
+Local file: /stock/war-drone-mav-test.jpg

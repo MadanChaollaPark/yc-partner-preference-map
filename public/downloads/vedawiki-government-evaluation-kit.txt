@@ -1,0 +1,37 @@
+Vedawiki Government Evaluation Kit
+Version: public manifest, May 2026
+
+Vedawiki builds a controller-side flight recorder for authorized government drone
+evaluation, training debriefs, and manufacturer QA programs.
+
+This public kit is a manifest, not an unrestricted operational binary. Signed
+tool builds and device images are released only to authorized government,
+military, or approved manufacturer contacts after onboarding.
+
+Current prototype
+- Records USB HID / Xbox-compatible gamepad input.
+- Saves timestamped controller events.
+- Exports structured logs for review sessions.
+- Starts at the controller side so mixed fleets can be evaluated before each
+  drone model has a deep telemetry integration.
+
+Evaluation package available after onboarding
+- Signed logger build.
+- Supported controller list.
+- Pilot deployment checklist.
+- Data handling and chain-of-custody worksheet.
+- Debrief viewer / API documentation.
+
+Data posture
+- Explicit authorization required.
+- Local-first capture supported.
+- No informal mission scraping.
+- Exports are intended for approved review, training, QA, or procurement
+  evaluation workflows.
+
+Request access
+Email: contact@vedawiki.com
+Subject: Vedawiki government evaluation
+
+Please include organization, role, intended evaluation use, country/program,
+controller models, and required security constraints.

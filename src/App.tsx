@@ -1,618 +1,409 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import {
-  AlertTriangle,
-  ArrowDownUp,
-  Bot,
-  Building2,
+  Activity,
+  ArrowRight,
+  ChartNoAxesCombined,
   CheckCircle2,
+  Cpu,
   Database,
-  ExternalLink,
-  Info,
-  Link as LinkIcon,
-  Search,
-  SlidersHorizontal,
-  Users,
+  Download,
+  FileCheck2,
+  Gauge,
+  KeyRound,
+  LockKeyhole,
+  Mail,
+  Plug,
+  Radio,
+  Server,
+  ShieldCheck,
+  Usb,
 } from 'lucide-react'
-import rawData from './data/yc-preferences.json'
 import './App.css'
+import { RecorderDashboard } from './RecorderDashboard'
 
-type CountItem = {
-  label: string
-  value: number
-}
-
-type Founder = {
-  name: string
+type IconCard = {
+  icon: ReactNode
   title: string
-  bio: string
-  linkedinUrl: string | null
-  twitterUrl: string | null
-}
-
-type PivotSignal = {
-  label: string
-  text: string
-  sourceUrl: string
-}
-
-type Company = {
-  slug: string
-  name: string
-  oneLiner: string
-  batch: string
-  status: string
-  stage: string | null
-  teamSize: number | null
-  location: string
-  tags: string[]
-  industries: string[]
-  founders: Founder[]
-  formerNames: string[]
-  pivotSignals: PivotSignal[]
-  url: string
-}
-
-type Signal = {
-  type: string
-  label: string
-  sourceUrl: string
   text: string
 }
 
-type Partner = {
+type HeroOption = {
   id: string
   name: string
-  role: string
-  category: string
-  bio: string
-  photo: string | null
-  url: string | null
-  alumniCompany: string | null
+  image: string
+  position: string
+  source: string
   sourceUrl: string
-  signals: Signal[]
-  companies: Company[]
-  agent: {
-    id: string
-    owner: string
-    status: string
-    task: string
-  }
-  preferences: {
-    investmentCount: number
-    topTags: CountItem[]
-    topIndustries: CountItem[]
-    topLocations: CountItem[]
-    founderSignals: CountItem[]
-    thesis: string[]
-    confidence: 'strong' | 'directional' | 'thin'
-  }
 }
 
-type Dataset = {
-  generatedAt: string
-  coverage: {
-    allYcCompanyRecords: number
-    companyPagesFetched: number
-    companiesWithPrimaryPartner: number
-    partnersFromYcPeoplePage: number
-    visitingPartnersSeeded: number
-    historicalPartnersSeeded: number
-    caveat: string
-  }
-  sources: {
-    label: string
-    url: string
-    kind: string
-    note: string
-  }[]
-  partners: Partner[]
-  companies: Company[]
-}
+const heroOptions: HeroOption[] = [
+  {
+    id: '1',
+    name: 'Reaper over terrain',
+    image: '/stock/war-drone-reaper-flight.jpg',
+    position: '72% center',
+    source: 'U.S. Air Force / Wikimedia Commons',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:MQ-9_Reaper_UAV.jpg',
+  },
+  {
+    id: '2',
+    name: 'Preflight check',
+    image: '/stock/war-drone-reaper-ground.jpg',
+    position: '64% center',
+    source: 'U.S. Air National Guard / Wikimedia Commons',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:MQ-9_Reaper_unmanned_aerial_vehicle.jpg',
+  },
+  {
+    id: '3',
+    name: 'FPV field test',
+    image: '/stock/war-drone-fpv-flight.jpg',
+    position: '66% center',
+    source: 'U.S. Army / Wikimedia Commons',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:First_person_view_drone_in_flight_(8285124).jpg',
+  },
+  {
+    id: '4',
+    name: 'Micro air vehicle',
+    image: '/stock/war-drone-mav-test.jpg',
+    position: '70% center',
+    source: 'U.S. Navy / Wikimedia Commons',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:MicroAirVehicle.jpg',
+  },
+]
 
-const data = rawData as Dataset
+const downloadItems = [
+  'Public evaluation manifest',
+  'Controlled-build request path',
+  'Pilot deployment checklist',
+  'Data handling and authorization notes',
+]
 
-const categoryLabels: Record<string, string> = {
-  all: 'All',
-  current: 'Current',
-  visiting: 'Visiting',
-  historical: 'Historical',
-  attributed: 'Attributed',
-}
+const useCases: IconCard[] = [
+  {
+    icon: <Gauge size={22} />,
+    title: 'Training debriefs',
+    text: 'Replay operator inputs with timestamps so instructors can review timing, control discipline, and repeated mistakes.',
+  },
+  {
+    icon: <ChartNoAxesCombined size={22} />,
+    title: 'Fleet evaluation',
+    text: 'Compare authorized missions across teams, controller profiles, manufacturers, and environments.',
+  },
+  {
+    icon: <Cpu size={22} />,
+    title: 'Manufacturer QA',
+    text: 'Give drone builders a normalized record of operator-side events when investigating failures or performance gaps.',
+  },
+]
 
-const confidenceLabels: Record<string, string> = {
-  all: 'All confidence',
-  strong: 'Strong',
-  directional: 'Directional',
-  thin: 'Thin',
-}
+const trustControls: IconCard[] = [
+  {
+    icon: <ShieldCheck size={22} />,
+    title: 'Authorized collection',
+    text: 'Designed for explicit government, military, or manufacturer evaluation programs. No informal mission scraping.',
+  },
+  {
+    icon: <LockKeyhole size={22} />,
+    title: 'Local-first capture',
+    text: 'Logs are recorded at the controller side and can remain offline until an approved export or review workflow.',
+  },
+  {
+    icon: <KeyRound size={22} />,
+    title: 'Chain of custody',
+    text: 'Exports are structured for signed sessions, hashes, custody notes, and role-based access in the review process.',
+  },
+]
 
-const sortLabels: Record<string, string> = {
-  count: 'Most attributions',
-  alpha: 'A-Z',
-  confidence: 'Confidence',
-}
+const pilotSteps = [
+  {
+    label: '01',
+    title: 'Download the public kit',
+    text: 'Review the evaluation manifest, supported controller path, and data handling model.',
+  },
+  {
+    label: '02',
+    title: 'Request a signed build',
+    text: 'Government or authorized manufacturer contacts receive controlled binaries and onboarding materials.',
+  },
+  {
+    label: '03',
+    title: 'Run a bounded pilot',
+    text: 'Start with controller-side sessions, debrief reports, and manufacturer feedback loops before deeper integrations.',
+  },
+]
 
-const confidenceRank = {
-  strong: 3,
-  directional: 2,
-  thin: 1,
-}
+const recorderFacts = [
+  { label: 'Recorder', value: 'Native Python process' },
+  { label: 'Data', value: 'Append-only JSONL' },
+  { label: 'Dashboard', value: 'Local replay and export' },
+]
 
 function App() {
-  const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('all')
-  const [confidence, setConfidence] = useState('all')
-  const [sortBy, setSortBy] = useState('count')
-  const [selectedId, setSelectedId] = useState(data.partners[0]?.id ?? '')
-  const [companyQuery, setCompanyQuery] = useState('')
+  const [heroIndex, setHeroIndex] = useState(getInitialHeroIndex)
+  const heroOption = heroOptions[heroIndex] ?? heroOptions[0]
 
-  const filteredPartners = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
-    return data.partners
-      .filter((partner) => {
-        const matchesCategory =
-          category === 'all' ||
-          partner.category === category ||
-          (category === 'visiting' && partner.category === 'historical')
-        const matchesConfidence =
-          confidence === 'all' || partner.preferences.confidence === confidence
-        const searchable = [
-          partner.name,
-          partner.role,
-          partner.bio,
-          partner.alumniCompany ?? '',
-          ...partner.preferences.topTags.map((tag) => tag.label),
-          ...partner.preferences.topIndustries.map((industry) => industry.label),
-        ]
-          .join(' ')
-          .toLowerCase()
-        return (
-          matchesCategory &&
-          matchesConfidence &&
-          (!normalizedQuery || searchable.includes(normalizedQuery))
-        )
-      })
-      .sort((a, b) => {
-        if (sortBy === 'alpha') return a.name.localeCompare(b.name)
-        if (sortBy === 'confidence') {
-          return (
-            confidenceRank[b.preferences.confidence] -
-              confidenceRank[a.preferences.confidence] ||
-            b.companies.length - a.companies.length
-          )
-        }
-        return b.companies.length - a.companies.length || a.name.localeCompare(b.name)
-      })
-  }, [category, confidence, query, sortBy])
-
-  const selectedPartner =
-    filteredPartners.find((partner) => partner.id === selectedId) ??
-    filteredPartners[0] ??
-    data.partners[0]
-
-  const selectedCompanies = useMemo(() => {
-    const normalizedQuery = companyQuery.trim().toLowerCase()
-    if (!selectedPartner) return []
-    return selectedPartner.companies.filter((company) => {
-      const searchable = [
-        company.name,
-        company.oneLiner,
-        company.batch,
-        company.location,
-        ...company.tags,
-        ...company.industries,
-        ...company.founders.map((founder) => `${founder.name} ${founder.bio}`),
-      ]
-        .join(' ')
-        .toLowerCase()
-      return !normalizedQuery || searchable.includes(normalizedQuery)
+  useEffect(() => {
+    heroOptions.forEach((option) => {
+      const image = new Image()
+      image.src = option.image
     })
-  }, [companyQuery, selectedPartner])
 
-  const topSourceKinds = useMemo(
-    () =>
-      data.sources.reduce<Record<string, number>>((counts, source) => {
-        counts[source.kind] = (counts[source.kind] ?? 0) + 1
-        return counts
-      }, {}),
-    [],
-  )
+    const intervalId = window.setInterval(() => {
+      setHeroIndex((index) => (index + 1) % heroOptions.length)
+    }, 5500)
 
-  if (!selectedPartner) {
-    return <main className="empty-state">No partner data loaded.</main>
-  }
+    return () => window.clearInterval(intervalId)
+  }, [])
 
   return (
-    <main className="app-shell">
-      <header className="topbar">
-        <div className="brand-mark">Y</div>
-        <div>
-          <p className="eyebrow">YC Partner Preference Map</p>
-          <h1>Partner signals from public YC data</h1>
-        </div>
+    <main className="site-shell" id="top">
+      <header className="site-header">
+        <a className="brand" href="#top" aria-label="Vedawiki home">
+          <span className="brand-mark">V</span>
+          <span>Vedawiki</span>
+        </a>
+        <nav aria-label="Primary navigation">
+          <a href="#dashboard">Dashboard</a>
+          <a href="#download">Download</a>
+          <a href="#how">How it works</a>
+          <a href="#trust">Security</a>
+        </nav>
         <a
-          className="source-link"
-          href="https://www.ycombinator.com/companies"
-          target="_blank"
-          rel="noreferrer"
-          title="Open YC company directory"
+          className="header-action"
+          href="/downloads/vedawiki-government-evaluation-kit.txt"
+          download
         >
-          <ExternalLink size={16} aria-hidden="true" />
-          YC Directory
+          <Download size={16} aria-hidden="true" />
+          Download kit
         </a>
       </header>
 
-      <section className="metrics-strip" aria-label="Dataset coverage">
-        <Metric
-          icon={<Database size={18} />}
-          label="YC index"
-          value={formatNumber(data.coverage.allYcCompanyRecords)}
+      <section className="hero" aria-labelledby="hero-title">
+        <img
+          className="hero-image"
+          src={heroOption.image}
+          alt=""
+          aria-hidden="true"
+          style={{ objectPosition: heroOption.position }}
         />
-        <Metric
-          icon={<Building2 size={18} />}
-          label="Fetched pages"
-          value={formatNumber(data.coverage.companyPagesFetched)}
-        />
-        <Metric
-          icon={<CheckCircle2 size={18} />}
-          label="Partner attributions"
-          value={formatNumber(data.coverage.companiesWithPrimaryPartner)}
-        />
-        <Metric
-          icon={<Users size={18} />}
-          label="Agents tracked"
-          value={formatNumber(data.partners.length)}
-        />
+        <div className="hero-shade" />
+        <div className="hero-content">
+          <p className="eyebrow">Controlled evaluation build</p>
+          <h1 id="hero-title">Vedawiki Field Recorder</h1>
+          <p className="hero-lede">
+            Authorized controller-side telemetry recorder for training, debriefing,
+            QA, and evaluation programs.
+          </p>
+          <div className="hero-actions">
+            <a className="button primary" href="#dashboard">
+              <Server size={18} aria-hidden="true" />
+              Open recorder dashboard
+            </a>
+            <a
+              className="button secondary"
+              href="/downloads/vedawiki-government-evaluation-kit.txt"
+              download
+            >
+              <Download size={18} aria-hidden="true" />
+              Download evaluation kit
+            </a>
+            <a
+              className="button secondary"
+              href="mailto:contact@vedawiki.com?subject=Vedawiki%20government%20evaluation"
+            >
+              <Mail size={18} aria-hidden="true" />
+              Request signed build
+            </a>
+          </div>
+          <dl className="hero-facts" aria-label="Recorder facts">
+            {recorderFacts.map((fact) => (
+              <div key={fact.label}>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </section>
 
-      <section className="notice" aria-label="Data caveat">
-        <AlertTriangle size={18} aria-hidden="true" />
-        <span>{data.coverage.caveat}</span>
-      </section>
+      <RecorderDashboard />
 
-      <section className="workspace">
-        <aside className="partner-panel">
-          <div className="panel-heading">
+      <section className="download-band" id="download" aria-labelledby="download-title">
+        <div className="section-copy">
+          <p className="eyebrow">Government download</p>
+          <h2 id="download-title">Start evaluation without integrating into the drone.</h2>
+          <p>
+            Vedawiki begins at the controller because that is the fastest place to
+            collect useful flight data across mixed drone fleets. The public kit explains
+            the controlled build, supported capture path, and pilot requirements.
+          </p>
+        </div>
+        <div className="download-panel">
+          <div className="download-panel-header">
+            <FileCheck2 size={22} aria-hidden="true" />
             <div>
-              <h2>Agents</h2>
-              <p>
-                {filteredPartners.length} profiles · {data.coverage.historicalPartnersSeeded}{' '}
-                historical seeds
-              </p>
+              <strong>Vedawiki government evaluation kit</strong>
+              <span>Text manifest · public download</span>
             </div>
-            <Bot size={20} aria-hidden="true" />
           </div>
-
-          <label className="search-box">
-            <Search size={16} aria-hidden="true" />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search partner, domain, founder signal"
-            />
-          </label>
-
-          <div className="filter-group" aria-label="Partner category">
-            {Object.keys(categoryLabels).map((key) => (
-              <button
-                className={category === key ? 'active' : ''}
-                key={key}
-                type="button"
-                onClick={() => setCategory(key)}
-              >
-                {categoryLabels[key]}
-              </button>
+          <ul>
+            {downloadItems.map((item) => (
+              <li key={item}>
+                <CheckCircle2 size={16} aria-hidden="true" />
+                {item}
+              </li>
             ))}
-          </div>
-
-          <div className="select-row">
-            <label>
-              <SlidersHorizontal size={15} aria-hidden="true" />
-              <select
-                value={confidence}
-                onChange={(event) => setConfidence(event.target.value)}
-                aria-label="Confidence filter"
-              >
-                {Object.keys(confidenceLabels).map((key) => (
-                  <option key={key} value={key}>
-                    {confidenceLabels[key]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <ArrowDownUp size={15} aria-hidden="true" />
-              <select
-                value={sortBy}
-                onChange={(event) => setSortBy(event.target.value)}
-                aria-label="Sort partners"
-              >
-                {Object.keys(sortLabels).map((key) => (
-                  <option key={key} value={key}>
-                    {sortLabels[key]}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div className="partner-list" role="list">
-            {filteredPartners.map((partner) => (
-              <button
-                className={selectedPartner.id === partner.id ? 'partner-row active' : 'partner-row'}
-                key={partner.id}
-                type="button"
-                onClick={() => {
-                  setSelectedId(partner.id)
-                  setCompanyQuery('')
-                }}
-              >
-                <Avatar partner={partner} />
-                <span className="partner-row-main">
-                  <span className="partner-row-name">{partner.name}</span>
-                  <span className="partner-row-meta">
-                    {partner.role} · {partner.companies.length} companies
-                  </span>
-                </span>
-                <span className={`confidence-dot ${partner.preferences.confidence}`} />
-              </button>
-            ))}
-          </div>
-        </aside>
-
-        <section className="detail-panel">
-          <div className="profile-header">
-            <Avatar partner={selectedPartner} large />
-            <div className="profile-main">
-              <div className="profile-title-row">
-                <div>
-                  <h2>{selectedPartner.name}</h2>
-                  <p>
-                    {selectedPartner.role}
-                    {selectedPartner.alumniCompany ? ` · ${selectedPartner.alumniCompany}` : ''}
-                  </p>
-                </div>
-                <StatusBadge confidence={selectedPartner.preferences.confidence} />
-              </div>
-              <p className="bio">{selectedPartner.bio || 'No public bio is loaded yet.'}</p>
-              <div className="agent-line">
-                <Bot size={16} aria-hidden="true" />
-                <span>{selectedPartner.agent.id}</span>
-                <strong>{selectedPartner.agent.status}</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="insight-grid">
-            <InsightBlock title="Preference Thesis" items={selectedPartner.preferences.thesis} />
-            <BarBlock title="Top Tags" items={selectedPartner.preferences.topTags} />
-            <BarBlock title="Industries" items={selectedPartner.preferences.topIndustries} />
-            <BarBlock title="Founder Signals" items={selectedPartner.preferences.founderSignals} />
-          </div>
-
-          {selectedPartner.signals.length > 0 ? (
-            <section className="signal-band">
-              <div className="section-title">
-                <Info size={17} aria-hidden="true" />
-                <h3>Visiting or Historical Signals</h3>
-              </div>
-              <div className="signal-list">
-                {selectedPartner.signals.map((signal) => (
-                  <a
-                    href={signal.sourceUrl}
-                    key={`${signal.label}-${signal.sourceUrl}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <strong>{signal.type}</strong>
-                    <span>{signal.label}</span>
-                    <p>{signal.text}</p>
-                  </a>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          <section className="company-section">
-            <div className="company-heading">
-              <div>
-                <h3>Attributed Companies</h3>
-                <p>
-                  {selectedCompanies.length} of {selectedPartner.companies.length} public
-                  primary-partner records
-                </p>
-              </div>
-              <label className="search-box compact">
-                <Search size={15} aria-hidden="true" />
-                <input
-                  value={companyQuery}
-                  onChange={(event) => setCompanyQuery(event.target.value)}
-                  placeholder="Filter companies or founders"
-                />
-              </label>
-            </div>
-
-            <div className="company-list">
-              {selectedCompanies.slice(0, 24).map((company) => (
-                <CompanyRow company={company} key={company.slug} />
-              ))}
-              {selectedCompanies.length === 0 ? (
-                <div className="empty-inline">No companies match this filter.</div>
-              ) : null}
-            </div>
-          </section>
-
-          <section className="sources-section">
-            <div className="section-title">
-              <LinkIcon size={17} aria-hidden="true" />
-              <h3>Source Mix</h3>
-            </div>
-            <div className="source-grid">
-              {data.sources.slice(0, 8).map((source) => (
-                <a href={source.url} key={source.url} target="_blank" rel="noreferrer">
-                  <span>{source.kind}</span>
-                  <strong>{source.label}</strong>
-                  <p>{source.note}</p>
-                </a>
-              ))}
-            </div>
-            <p className="source-summary">
-              Official sources: {topSourceKinds.official ?? 0}; community sources:{' '}
-              {topSourceKinds.community ?? 0}. Generated{' '}
-              {new Intl.DateTimeFormat(undefined, {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-              }).format(new Date(data.generatedAt))}
-              .
-            </p>
-          </section>
-        </section>
+          </ul>
+          <a
+            className="button primary full"
+            href="/downloads/vedawiki-government-evaluation-kit.txt"
+            download
+          >
+            <Download size={18} aria-hidden="true" />
+            Download kit
+          </a>
+        </div>
       </section>
+
+      <section className="work-section" id="how" aria-labelledby="how-title">
+        <div className="section-heading">
+          <p className="eyebrow">How it works</p>
+          <h2 id="how-title">A flight recorder at the operator side.</h2>
+        </div>
+        <div className="work-grid">
+          <div className="system-diagram" aria-label="Controller-side recording flow">
+            <SystemNode icon={<Radio size={22} />} title="Controller" text="Operator inputs" />
+            <ArrowRight className="flow-arrow" size={26} aria-hidden="true" />
+            <SystemNode icon={<Usb size={22} />} title="Native recorder" text="pygame polling and JSONL logs" />
+            <ArrowRight className="flow-arrow" size={26} aria-hidden="true" />
+            <SystemNode icon={<Server size={22} />} title="Dashboard" text="Local FastAPI replay and CSV export" />
+          </div>
+          <div className="work-copy">
+            <p>
+              The prototype records Xbox-compatible controller input and saves timestamped
+              event logs from a native local process. The browser is only the replay and
+              export UI; no browser permission step is required for the recorder path.
+            </p>
+            <div className="spec-list">
+              <Spec icon={<Plug size={18} />} label="No drone modification required" />
+              <Spec icon={<Activity size={18} />} label="Structured session replay data" />
+              <Spec icon={<Database size={18} />} label="Exports for approved analytics workflows" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="use-section" aria-labelledby="use-title">
+        <div className="section-heading">
+          <p className="eyebrow">Evaluation uses</p>
+          <h2 id="use-title">Built for repeatable review, not anecdotes.</h2>
+        </div>
+        <div className="card-grid">
+          {useCases.map((item) => (
+            <InfoCard key={item.title} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="trust-section" id="trust" aria-labelledby="trust-title">
+        <div className="section-heading">
+          <p className="eyebrow">Security posture</p>
+          <h2 id="trust-title">Authorized data, controlled movement.</h2>
+          <p>
+            Defense flight data only matters if users trust the custody path. Vedawiki is
+            designed around explicit authorization, local capture, and structured export
+            controls for review teams.
+          </p>
+        </div>
+        <div className="card-grid">
+          {trustControls.map((item) => (
+            <InfoCard key={item.title} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="pilot-section" id="pilot" aria-labelledby="pilot-title">
+        <div className="section-heading">
+          <p className="eyebrow">Pilot path</p>
+          <h2 id="pilot-title">From download to field evaluation.</h2>
+        </div>
+        <div className="timeline">
+          {pilotSteps.map((step) => (
+            <article className="timeline-step" key={step.label}>
+              <span>{step.label}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="closing-band" aria-labelledby="closing-title">
+        <div>
+          <p className="eyebrow">For authorized programs</p>
+          <h2 id="closing-title">Evaluate a drone-agnostic flight recorder.</h2>
+        </div>
+        <div className="closing-actions">
+          <a
+            className="button primary"
+            href="/downloads/vedawiki-government-evaluation-kit.txt"
+            download
+          >
+            <Download size={18} aria-hidden="true" />
+            Download kit
+          </a>
+          <a
+            className="button secondary"
+            href="mailto:contact@vedawiki.com?subject=Vedawiki%20government%20evaluation"
+          >
+            <Mail size={18} aria-hidden="true" />
+            Contact Vedawiki
+          </a>
+        </div>
+      </section>
+
+      <footer className="site-footer">
+        <span>Vedawiki</span>
+        <span>Controller-side flight recording for authorized defense evaluation.</span>
+      </footer>
     </main>
   )
 }
 
-function Metric({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode
-  label: string
-  value: string
-}) {
+function getInitialHeroIndex() {
+  if (typeof window === 'undefined') return 0
+  const requested = new URLSearchParams(window.location.search).get('photo')
+  const index = heroOptions.findIndex((option) => option.id === requested)
+  return index === -1 ? 0 : index
+}
+
+function InfoCard({ item }: { item: IconCard }) {
   return (
-    <div className="metric">
-      <span>{icon}</span>
-      <div>
-        <strong>{value}</strong>
-        <p>{label}</p>
-      </div>
-    </div>
-  )
-}
-
-function Avatar({ partner, large = false }: { partner: Partner; large?: boolean }) {
-  return partner.photo ? (
-    <img
-      className={large ? 'avatar large' : 'avatar'}
-      src={partner.photo}
-      alt=""
-      loading="lazy"
-    />
-  ) : (
-    <span className={large ? 'avatar initials large' : 'avatar initials'}>
-      {partner.name
-        .split(' ')
-        .map((part) => part[0])
-        .join('')
-        .slice(0, 2)}
-    </span>
-  )
-}
-
-function StatusBadge({ confidence }: { confidence: Partner['preferences']['confidence'] }) {
-  return <span className={`status-badge ${confidence}`}>{confidence}</span>
-}
-
-function InsightBlock({ title, items }: { title: string; items: string[] }) {
-  return (
-    <section className="insight-block">
-      <h3>{title}</h3>
-      {items.length ? (
-        <ul>
-          {items.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className="muted">No thesis generated yet.</p>
-      )}
-    </section>
-  )
-}
-
-function BarBlock({ title, items }: { title: string; items: CountItem[] }) {
-  const max = Math.max(...items.map((item) => item.value), 1)
-  return (
-    <section className="insight-block">
-      <h3>{title}</h3>
-      {items.length ? (
-        <div className="bar-list">
-          {items.slice(0, 6).map((item) => (
-            <div className="bar-row" key={item.label}>
-              <span>{item.label}</span>
-              <div className="bar-track">
-                <div style={{ width: `${Math.max((item.value / max) * 100, 8)}%` }} />
-              </div>
-              <strong>{item.value}</strong>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="muted">Not enough records yet.</p>
-      )}
-    </section>
-  )
-}
-
-function CompanyRow({ company }: { company: Company }) {
-  const founderBios = company.founders.filter((founder) => founder.bio)
-  return (
-    <article className="company-row">
-      <div className="company-main">
-        <div>
-          <a href={company.url} target="_blank" rel="noreferrer">
-            {company.name}
-            <ExternalLink size={14} aria-hidden="true" />
-          </a>
-          <p>{company.oneLiner}</p>
-        </div>
-        <div className="company-tags">
-          {uniqueStrings([...company.industries, ...company.tags])
-            .slice(0, 5)
-            .map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-        </div>
-      </div>
-      <div className="company-meta">
-        <span>{company.batch}</span>
-        <span>{company.status}</span>
-        <span>{company.location || 'Location n/a'}</span>
-        <span>{company.teamSize ? `${company.teamSize} people` : 'Team n/a'}</span>
-      </div>
-      <div className="founder-strip">
-        {company.founders.slice(0, 4).map((founder) => (
-          <div key={`${company.slug}-${founder.name}`}>
-            <strong>{founder.name}</strong>
-            <span>{founder.title || 'Founder'}</span>
-            {founder.bio ? <p>{founder.bio}</p> : null}
-          </div>
-        ))}
-      </div>
-      {company.pivotSignals.length || company.formerNames.length ? (
-        <div className="pivot-strip">
-          {company.formerNames.length ? (
-            <span>Formerly {company.formerNames.join(', ')}</span>
-          ) : null}
-          {company.pivotSignals.slice(0, 4).map((pivot) => (
-            <span key={`${pivot.label}-${pivot.text}`}>{pivot.text}</span>
-          ))}
-        </div>
-      ) : founderBios.length === 0 ? (
-        <div className="pivot-strip quiet">Founder bios are not public on this record.</div>
-      ) : null}
+    <article className="info-card">
+      <span className="icon-tile">{item.icon}</span>
+      <h3>{item.title}</h3>
+      <p>{item.text}</p>
     </article>
   )
 }
 
-function formatNumber(value: number) {
-  return new Intl.NumberFormat().format(value)
+function SystemNode({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
+  return (
+    <article className="system-node">
+      <span className="icon-tile">{icon}</span>
+      <h3>{title}</h3>
+      <p>{text}</p>
+    </article>
+  )
 }
 
-function uniqueStrings(items: string[]) {
-  return [...new Set(items.filter(Boolean))]
+function Spec({ icon, label }: { icon: ReactNode; label: string }) {
+  return (
+    <div className="spec-item">
+      {icon}
+      <span>{label}</span>
+    </div>
+  )
 }
 
 export default App
