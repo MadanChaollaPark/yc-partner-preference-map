@@ -337,3 +337,51 @@ def assign_known_field(sample: dict[str, Any], key: str, value: Any) -> None:
         sample["flight_mode"] = str(value)
     elif key in {"armed", "is_armed"}:
         sample["armed"] = bool(value)
+    elif re.fullmatch(r"(rc|ch|channel)_?\d+", key):
+        sample.setdefault("controller", {}).setdefault("channels", {})[key] = value
+    elif key in {"lx", "ly", "rx", "ry", "lt", "rt"}:
+        sample.setdefault("controller", {}).setdefault("axes", {})[key] = value
+    else:
+        sample.setdefault("telemetry", {})[key] = value
+
+
+def raw_only_samples(input_path: Path, reason: str) -> list[dict[str, Any]]:
+    return [
+        {
+            "event": "source_event",
+            "source_event": "raw_log_registered",
+            "source_row": 1,
+            "decode_status": "raw_only",
+            "reason": reason,
+            "file_name": input_path.name,
+            "t_ms": 0,
+        }
+    ]
+
+
+def session_start_event(
+    input_path: Path,
+    source: RecorderSource,
+    source_hash: str,
+    imported_at: datetime,
+    raw_archive_path: Path | None,
+    decode_status: str,
+    note: str | None,
+) -> dict[str, Any]:
+    event: dict[str, Any] = {
+        "event": "session_start",
+        "schema": SCHEMA,
+        "product": "Vedawiki Field Recorder",
+        "purpose": "authorized passive telemetry import for training, debriefing, QA, and evaluation",
+        "record_only": True,
+        "imported": True,
+        "imported_at": imported_at.isoformat(),
+        "started_at": imported_at.isoformat(),
+        "t_ms": 0,
+        "source": source.to_dict(),
+        "input_file": {
+            "name": input_path.name,
+            "size_bytes": input_path.stat().st_size,
+            "sha256": source_hash,
+            "decode_status": decode_status,
+            "raw_archived_as": str(raw_archive_path) if raw_archive_path else None,
