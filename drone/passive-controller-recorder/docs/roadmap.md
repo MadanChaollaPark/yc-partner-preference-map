@@ -57,3 +57,61 @@ Exit criteria:
 
 ## Phase 3: Autel and ArduPilot/PX4 Coverage
 
+Goals:
+
+- Add Autel Smart Controller V3 and Autel Enterprise/App exported-log intake.
+- Add ArduPilot/PX4 copied-log intake for Pixhawk, Cube, Matek, and CUAV-class systems.
+- Expand schemas for airframe, controller, sensor, and mission/session metadata when present in owned logs.
+- Improve report views for maintenance and incident reconstruction.
+
+Exit criteria:
+
+- Autel and ArduPilot/PX4 records follow the same provenance model as DJI and FPV records.
+- Parser limitations are explicit and test-covered.
+- The project still performs no live device, network, or link interaction.
+
+## Phase 4: Fiber-Optic FPV Endpoint Artifacts
+
+Goals:
+
+- Support fiber-optic FPV sessions through endpoint artifacts only.
+- Link FC logs, DVR/video, and operator-provided session metadata.
+- Model uncertainty clearly when telemetry is unavailable.
+
+Exit criteria:
+
+- Fiber-optic sessions can be cataloged without any link-side assumptions.
+- Reports clearly separate observed endpoint evidence from missing or unknown data.
+
+## Phase 5: Review, Reporting, and Governance
+
+Goals:
+
+- Add operator-friendly summaries for maintenance, compliance, and incident review.
+- Add redaction and export options for sharing reports safely.
+- Add retention metadata and optional policy checks.
+- Document fixture rules and contribution requirements.
+
+Exit criteria:
+
+- Reports are useful without exposing unnecessary sensitive data.
+- Contributions cannot add active collection or non-interference violations without failing review.
+- Documentation remains aligned with the safety scope.
+
+## Backlog
+
+- Schema versioning and migration notes.
+- Synthetic sample generator.
+- Redaction profiles for location, operator, aircraft, and organization identifiers.
+- Offline HTML or Markdown report export.
+- Import manifests for chain-of-custody style review.
+- Cross-artifact timeline reconstruction from owned endpoint records.
+
+## Explicit Non-Goals
+
+- RF capture or interception.
+- Proprietary-link bypass.
+- Jamming, spoofing, replay, injection, or command/control features.
+- Live aircraft or controller integration.
+- Third-party collection.
+- Targeting or battlefield collection workflows.
