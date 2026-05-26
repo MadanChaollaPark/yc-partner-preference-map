@@ -1,0 +1,74 @@
+{
+  "template_version": "1.0.0",
+  "source_id": "source-operator-controller-001",
+  "source_label": "Operator-owned controller export",
+  "safety_posture": {
+    "passive_only": true,
+    "allowed_capture_families": [
+      "owned_exported_log",
+      "controller_endpoint_capture",
+      "operator_endpoint_capture",
+      "authorized_cloud_export"
+    ],
+    "prohibited_capture_methods": [
+      "radio_link_interception",
+      "third_party_account_access",
+      "ambient_network_capture",
+      "control_signal_injection",
+      "bypass_access_controls"
+    ],
+    "third_party_data_handling": "exclude"
+  },
+  "authorization_basis": {
+    "basis_type": "owned_device",
+    "authorized_by": "Operator Name or Organization",
+    "authorized_at": "2026-05-26T12:00:00Z",
+    "expires_at": "2026-06-25T12:00:00Z",
+    "statement": "Passive capture is limited to owned/exported controller logs and captures from endpoints under the operator's control.",
+    "evidence_uri": "file://authorization/authorization-record.pdf",
+    "scope": {
+      "source_owner": "Operator Name or Organization",
+      "operator_id_hashes": [
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+      ],
+      "vehicle_id_hashes": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "controller_id_hashes": [
+        "2222222222222222222222222222222222222222222222222222222222222222"
+      ],
+      "allowed_sources": [
+        "owned_exported_log",
+        "controller_endpoint_capture"
+      ],
+      "allowed_artifact_classes": [
+        "controller_log_export",
+        "mobile_app_database",
+        "endpoint_capture"
+      ],
+      "time_window": {
+        "start": "2026-05-26T00:00:00Z",
+        "end": "2026-05-26T23:59:59Z"
+      },
+      "limitations": "Do not ingest radio-link intercepts, unrelated ambient traffic, third-party account data, or artifacts outside the authorized time window."
+    }
+  },
+  "capture_mode": {
+    "mode": "owned_exported_logs",
+    "passive_only": true,
+    "source_control": "owned_device",
+    "endpoint_capture_scope": "none",
+    "acquisition_method": "user_export",
+    "disallowed_methods_acknowledged": true
+  },
+  "platform_family": "dji",
+  "controller_stack": {
+    "controller_type": "mobile_app",
+    "controller_software": {
+      "name": "Controller or ground station application",
+      "version": "0.0.0",
+      "vendor": "Vendor name"
+    },
+    "firmware": {
+      "controller_version": "0.0.0",
+      "aircraft_version": "0.0.0",
