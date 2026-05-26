@@ -217,3 +217,57 @@ class PassiveSourceAdapter:
             "classification": classification,
             "metadata": metadata,
         }
+
+
+def scan_with_adapter(adapter: PassiveSourceAdapter, path: object) -> AdapterResult:
+    return adapter.scan(path)
+
+
+def _normalize_extension(extension: str) -> str:
+    extension = extension.lower().strip()
+    if not extension:
+        return extension
+    if extension.startswith("."):
+        return extension
+    return ".{0}".format(extension)
+
+
+def _is_regular_file(path: Path, warnings: List[str]) -> bool:
+    try:
+        mode = path.stat().st_mode
+    except OSError as exc:
+        warnings.append("Could not stat {0}: {1}".format(path, exc))
+        return False
+
+    if stat.S_ISREG(mode):
+        return True
+
+    warnings.append("Skipped non-regular file: {0}".format(path))
+    return False
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(CHUNK_SIZE), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _relative_to(path: Path, root: Path) -> str:
+    try:
+        if root.is_dir():
+            return str(path.relative_to(root))
+        return path.name
+    except ValueError:
+        return path.name
+
+
+def _format_timestamp(timestamp: float) -> str:
+    return datetime.fromtimestamp(timestamp, timezone.utc).isoformat()
+
+
+def source_scan(adapter: PassiveSourceAdapter, path: object) -> AdapterResult:
+    """Compatibility alias for callers that prefer function-style adapters."""
+
+    return adapter.scan(path)
