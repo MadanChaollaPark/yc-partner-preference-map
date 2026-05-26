@@ -75,3 +75,42 @@ class ArtifactRecord:
         cls,
         path: Path,
         *,
+        source_type: str,
+        artifact_role: str = "raw_log",
+        parser: str = "generic",
+        notes: str | None = None,
+    ) -> "ArtifactRecord":
+        return cls(
+            source_type=source_type,
+            path=path,
+            sha256=sha256_file(path),
+            size_bytes=path.stat().st_size,
+            mime_type=guess_mime(path),
+            artifact_role=artifact_role,
+            parser=parser,
+            notes=notes,
+        )
+
+    def to_event(self, *, session_id: str, relative_path: str | None = None) -> dict[str, Any]:
+        return {
+            "event_id": new_id("event"),
+            "session_id": session_id,
+            "event_type": "artifact_observed",
+            "recorded_at": utc_now(),
+            "source_type": self.source_type,
+            "artifact": {
+                "path": relative_path or str(self.path),
+                "sha256": self.sha256,
+                "size_bytes": self.size_bytes,
+                "mime_type": self.mime_type,
+                "role": self.artifact_role,
+                "parser": self.parser,
+            },
+            "normalized": {},
+            "safety": PASSIVE_SAFETY_FLAGS.copy(),
+            "notes": self.notes,
+        }
+
+
+def make_manifest(
+    *,
