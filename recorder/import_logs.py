@@ -240,3 +240,51 @@ def normalize_record(record: dict[str, Any], row_index: int) -> dict[str, Any]:
     return sample
 
 
+def has_sample_payload(record: dict[str, Any]) -> bool:
+    for raw_key, raw_value in record.items():
+        key = normalize_key(str(raw_key))
+        if should_skip_key(key):
+            continue
+        if parse_scalar(raw_value) is not None:
+            return True
+    return any(isinstance(record.get(section), (dict, list)) for section in ("axes", "buttons", "hats"))
+
+
+def copy_nested(record: dict[str, Any], sample: dict[str, Any]) -> None:
+    axes = record.get("axes")
+    buttons = record.get("buttons")
+    hats = record.get("hats")
+    if isinstance(axes, dict) or isinstance(buttons, dict) or isinstance(hats, list):
+        controller = sample.setdefault("controller", {})
+        if isinstance(axes, dict):
+            controller["axes"] = axes
+        if isinstance(buttons, dict):
+            controller["buttons"] = buttons
+        if isinstance(hats, list):
+            controller["hats"] = hats
+
+    for section in ("gnss", "attitude", "power", "link", "telemetry"):
+        value = record.get(section)
+        if isinstance(value, dict):
+            sample[section] = value
+
+
+def assign_known_field(sample: dict[str, Any], key: str, value: Any) -> None:
+    gnss_fields = {
+        "lat": "lat_deg",
+        "latitude": "lat_deg",
+        "gps_lat": "lat_deg",
+        "gps_latitude": "lat_deg",
+        "lon": "lon_deg",
+        "lng": "lon_deg",
+        "longitude": "lon_deg",
+        "gps_lon": "lon_deg",
+        "gps_lng": "lon_deg",
+        "gps_longitude": "lon_deg",
+        "alt": "alt_m",
+        "altitude": "alt_m",
+        "alt_m": "alt_m",
+        "gps_alt": "alt_m",
+        "gps_altitude": "alt_m",
+        "satellites": "satellites",
+        "sats": "satellites",
