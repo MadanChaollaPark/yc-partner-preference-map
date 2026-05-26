@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.passive-controller-recorder.local/session-manifest.schema.json",
+  "title": "Passive Controller Recorder Session Manifest",
+  "description": "Session manifest produced by the passive-recorder init/import workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "created_at",
+    "platform_family",
+    "controller_stack",
+    "authorization_basis",
+    "capture_mode",
+    "redaction",
+    "time_sync",
+    "safety",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^session_[0-9a-f]{32}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "platform_family": {
+      "type": "string",
+      "minLength": 1,
+      "examples": ["dji_mavic_matrice", "fpv_betaflight", "autel_evo", "ardupilot_px4"]
+    },
+    "controller_stack": {
+      "type": "string",
+      "minLength": 1,
+      "examples": ["DJI RC Pro Enterprise", "Betaflight + ELRS/CRSF + EdgeTX"]
+    },
+    "authorization_basis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capture_mode": {
+      "type": "string",
+      "enum": [
+        "exported_log_import",
+        "owned_endpoint_capture",
+        "manual_session_metadata"
+      ]
+    },
+    "redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default",
+        "redact_precise_location",
+        "redact_operator_identity",
+        "redact_unit_or_customer_identity"
+      ],
+      "properties": {
+        "default": {
+          "type": "string",
+          "enum": ["redact_sensitive", "retain_all", "hash_sensitive"]
+        },
+        "redact_precise_location": {
+          "type": "boolean"
+        },
+        "redact_operator_identity": {
+          "type": "boolean"
+        },
+        "redact_unit_or_customer_identity": {
+          "type": "boolean"
+        }
+      }
+    },
