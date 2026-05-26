@@ -124,3 +124,45 @@ def _adapter_events(input_path: Path, *, source_type: str, session_id: str) -> l
     except (KeyError, PassiveRecorderError):
         return None
     result = adapter.scan(input_path)
+    if hasattr(result, "events"):
+        events = result.events
+    else:
+        events = result
+    normalized: list[dict[str, Any]] = []
+    for event in events:
+        event.setdefault("event_id", new_id("event"))
+        event.setdefault("session_id", session_id)
+        event.setdefault("recorded_at", utc_now())
+        event.setdefault("source_type", source_type)
+        event.setdefault("normalized", {})
+        event.setdefault("safety", PASSIVE_SAFETY_FLAGS.copy())
+        normalized.append(event)
+    return normalized
+
+
+def _generic_artifact_events(input_path: Path, *, source_type: str, session_id: str) -> list[dict[str, Any]]:
+    events: list[dict[str, Any]] = []
+    for file_path in iter_files(input_path):
+        record = ArtifactRecord.from_path(
+            file_path,
+            source_type=source_type,
+            parser="generic",
+            notes="Artifact hashed from local owned/exported input path.",
+        )
+        events.append(record.to_event(session_id=session_id))
+    return events
+
+
+def _copy_raw_artifacts(session_dir: Path, input_path: Path) -> list[dict[str, Any]]:
+    copied: list[dict[str, Any]] = []
+    destination_root = raw_dir(session_dir)
+    for file_path in iter_files(input_path):
+        if input_path.is_dir():
+            relative = file_path.relative_to(input_path)
+        else:
+            relative = Path(file_path.name)
+        destination = _unique_destination(destination_root / relative)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(file_path, destination)
+        record = ArtifactRecord.from_path(
+            destination,
