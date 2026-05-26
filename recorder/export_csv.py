@@ -32,17 +32,22 @@ def load_jsonl(path: Path, strict: bool = True) -> list[dict[str, Any]]:
 
 def session_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
     input_events = [event for event in events if event.get("event") == "input"]
+    sample_events = [event for event in events if event.get("event") == "sample"]
     start_event = next((event for event in events if event.get("event") == "session_start"), {})
     end_event = next((event for event in reversed(events) if event.get("event") == "session_end"), {})
     duration_ms = max((int(event.get("t_ms", 0) or 0) for event in events), default=0)
     controller = start_event.get("controller", {})
     return {
+        "schema": start_event.get("schema"),
         "started_at": start_event.get("started_at"),
         "ended_at": end_event.get("ended_at"),
         "duration_ms": duration_ms,
         "event_count": len(events),
         "input_count": len(input_events),
+        "sample_count": len(sample_events),
         "controller": controller if isinstance(controller, dict) else {},
+        "source": start_event.get("source", {}),
+        "input_file": start_event.get("input_file", {}),
     }
 
 
@@ -51,6 +56,12 @@ def jsonl_to_csv_text(path: Path, strict: bool = True) -> str:
 
 
 def events_to_csv_text(events: list[dict[str, Any]]) -> str:
+    if any(event.get("event") == "sample" for event in events):
+        return telemetry_events_to_csv_text(events)
+    return controller_events_to_csv_text(events)
+
+
+def controller_events_to_csv_text(events: list[dict[str, Any]]) -> str:
     button_names = collect_button_names(events)
     fieldnames = [
         "t_ms",
@@ -82,6 +93,39 @@ def events_to_csv_text(events: list[dict[str, Any]]) -> str:
         writer.writerow(row)
 
     return output.getvalue()
+
+
+def telemetry_events_to_csv_text(events: list[dict[str, Any]]) -> str:
+    rows = [flatten_event(event) for event in events]
+    preferred = ["t_ms", "timestamp", "event", "source_row", "source_event", "message_type"]
+    fields = sorted({field for row in rows for field in row})
+    fieldnames = [field for field in preferred if field in fields]
+    fieldnames.extend(field for field in fields if field not in fieldnames)
+
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=fieldnames)
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(row)
+    return output.getvalue()
+
+
+def flatten_event(event: dict[str, Any]) -> dict[str, Any]:
+    flattened: dict[str, Any] = {}
+
+    def visit(prefix: str, value: Any) -> None:
+        if isinstance(value, dict):
+            for child_key, child_value in value.items():
+                visit(f"{prefix}.{child_key}" if prefix else str(child_key), child_value)
+        elif isinstance(value, list):
+            flattened[prefix] = json.dumps(value, separators=(",", ":"))
+        elif value is None:
+            flattened[prefix] = ""
+        else:
+            flattened[prefix] = value
+
+    visit("", event)
+    return flattened
 
 
 def collect_button_names(events: list[dict[str, Any]]) -> list[str]:
