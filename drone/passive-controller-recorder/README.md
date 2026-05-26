@@ -68,3 +68,37 @@ Priority 1: DJI Mavic/Matrice ecosystems using DJI RC, DJI RC Pro Enterprise, Sm
 Priority 2: FPV multirotors using Betaflight flight controllers, ELRS/CRSF/SBUS configurations, and EdgeTX radios such as RadioMaster-class transmitters. Collection remains limited to owned endpoint logs and exported files.
 
 Priority 3: Autel EVO Max 4T and similar enterprise aircraft using Autel Smart Controller V3 and Autel Enterprise/App logs.
+
+Priority 4: Fixed-wing and larger recon platforms using ArduPilot/PX4 on Pixhawk, Cube, Matek, or CUAV-class flight controllers.
+
+Priority 5: Fiber-optic FPV systems, limited to endpoint-side artifacts such as FC logs, DVR/video, and operator-provided session metadata.
+
+See [docs/research.md](docs/research.md) and [docs/roadmap.md](docs/roadmap.md) for more detail.
+
+## Design Principles
+
+- Passive by default: the recorder reads files and metadata only.
+- Operator-owned data: every import path assumes explicit ownership or authorization.
+- Preserve originals: never modify source artifacts during import.
+- Provenance first: record where each artifact came from, who supplied it, and how it was processed.
+- Practical review: optimize for cataloging, auditability, maintenance, and incident analysis.
+- Safety gates: reject workflows that require interference with aircraft, controllers, links, or third-party systems.
+
+## Repository Layout
+
+Current layout:
+
+```text
+passive-controller-recorder/
+  README.md
+  docs/
+    research.md
+    roadmap.md
+    safety.md
+  samples/
+  schemas/
+  src/passive_recorder/
+  tests/
+```
+
+Documentation in this repository should keep the same safety boundary: owned/exported artifacts only, endpoint-side capture only, and no operational or offensive collection details.
