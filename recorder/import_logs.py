@@ -288,3 +288,52 @@ def assign_known_field(sample: dict[str, Any], key: str, value: Any) -> None:
         "gps_altitude": "alt_m",
         "satellites": "satellites",
         "sats": "satellites",
+        "gps_sats": "satellites",
+        "hdop": "hdop",
+    }
+    attitude_fields = {
+        "roll": "roll_deg",
+        "roll_deg": "roll_deg",
+        "pitch": "pitch_deg",
+        "pitch_deg": "pitch_deg",
+        "yaw": "yaw_deg",
+        "yaw_deg": "yaw_deg",
+        "heading": "heading_deg",
+        "heading_deg": "heading_deg",
+    }
+    power_fields = {
+        "battery": "battery_pct",
+        "battery_pct": "battery_pct",
+        "battery_percent": "battery_pct",
+        "bat": "battery_voltage_v",
+        "vbat": "battery_voltage_v",
+        "vfas": "battery_voltage_v",
+        "voltage": "battery_voltage_v",
+        "battery_voltage": "battery_voltage_v",
+        "rxbt": "receiver_voltage_v",
+        "current": "current_a",
+        "current_a": "current_a",
+    }
+    link_fields = {
+        "rssi": "rssi",
+        "rxrssi": "rssi",
+        "lq": "link_quality",
+        "link_quality": "link_quality",
+        "uplink_quality": "uplink_quality",
+        "downlink_quality": "downlink_quality",
+        "snr": "snr_db",
+        "noise": "noise_db",
+    }
+
+    if key in gnss_fields:
+        sample.setdefault("gnss", {})[gnss_fields[key]] = value
+    elif key in attitude_fields:
+        sample.setdefault("attitude", {})[attitude_fields[key]] = value
+    elif key in power_fields:
+        sample.setdefault("power", {})[power_fields[key]] = value
+    elif key in link_fields:
+        sample.setdefault("link", {})[link_fields[key]] = value
+    elif key in {"mode", "flight_mode", "flightmode"}:
+        sample["flight_mode"] = str(value)
+    elif key in {"armed", "is_armed"}:
+        sample["armed"] = bool(value)
