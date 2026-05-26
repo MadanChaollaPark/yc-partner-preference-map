@@ -40,3 +40,45 @@ def create_session(
         platform_family=platform_family,
         controller_stack=controller_stack,
         authorization_basis=authorization_basis,
+        capture_mode=capture_mode,
+        notes=notes,
+    )
+    write_json(manifest_path, manifest)
+    (session_dir / EVENTS_NAME).touch()
+    return manifest
+
+
+def raw_dir(session_dir: Path) -> Path:
+    return session_dir / RAW_DIR_NAME
+
+
+def load_manifest(session_dir: Path) -> dict[str, Any]:
+    manifest_path = session_dir / MANIFEST_NAME
+    if not manifest_path.exists():
+        raise PassiveRecorderError(f"Missing session manifest: {manifest_path}")
+    with manifest_path.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def save_manifest(session_dir: Path, manifest: dict[str, Any]) -> None:
+    manifest["updated_at"] = utc_now()
+    write_json(session_dir / MANIFEST_NAME, manifest)
+
+
+def write_json(path: Path, payload: dict[str, Any]) -> None:
+    with path.open("w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+
+
+def append_events(session_dir: Path, events: list[dict[str, Any]]) -> None:
+    with (session_dir / EVENTS_NAME).open("a", encoding="utf-8") as handle:
+        for event in events:
+            handle.write(json.dumps(event, sort_keys=True))
+            handle.write("\n")
+
+
+def import_source(
+    session_dir: Path,
+    input_path: Path,
+    *,
