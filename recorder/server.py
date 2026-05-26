@@ -11,8 +11,10 @@ from fastapi.responses import PlainTextResponse
 
 try:
     from .export_csv import jsonl_to_csv_text, load_jsonl, session_summary
+    from .sources import source_catalog
 except ImportError:  # pragma: no cover - supports `python recorder/server.py`.
     from export_csv import jsonl_to_csv_text, load_jsonl, session_summary
+    from sources import source_catalog
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -56,6 +58,11 @@ def list_sessions() -> dict[str, list[dict[str, Any]]]:
             }
         )
     return {"sessions": summaries}
+
+
+@app.get("/sources")
+def list_sources() -> dict[str, list[dict[str, Any]]]:
+    return {"sources": source_catalog()}
 
 
 @app.get("/sessions/{name}", response_model=None)
