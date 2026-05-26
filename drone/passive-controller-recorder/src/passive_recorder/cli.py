@@ -33,3 +33,38 @@ def build_parser() -> argparse.ArgumentParser:
 
     import_parser = subparsers.add_parser("import", help="Hash and index local exported artifacts.")
     import_parser.add_argument("session_dir", type=Path)
+    import_parser.add_argument("--input", required=True, type=Path)
+    import_parser.add_argument("--source-type", required=True, choices=SUPPORTED_SOURCE_TYPES)
+    import_parser.add_argument(
+        "--copy-raw",
+        action="store_true",
+        help="Copy raw artifacts into the session raw/ directory. Disabled by default.",
+    )
+    import_parser.set_defaults(func=_cmd_import)
+
+    show_parser = subparsers.add_parser("show", help="Print the session manifest.")
+    show_parser.add_argument("session_dir", type=Path)
+    show_parser.set_defaults(func=_cmd_show)
+
+    adapters_parser = subparsers.add_parser("list-adapters", help="List known passive import adapters.")
+    adapters_parser.set_defaults(func=_cmd_list_adapters)
+    return parser
+
+
+def _cmd_init(args: argparse.Namespace) -> int:
+    manifest = create_session(
+        args.session_dir,
+        platform_family=args.platform_family,
+        controller_stack=args.controller_stack,
+        authorization_basis=args.authorization_basis,
+        capture_mode=args.capture_mode,
+        notes=args.notes,
+    )
+    print(json.dumps({"session_id": manifest["session_id"], "session_dir": str(args.session_dir)}, indent=2))
+    return 0
+
+
+def _cmd_import(args: argparse.Namespace) -> int:
+    events = import_source(
+        args.session_dir,
+        args.input,
