@@ -69,3 +69,20 @@ class ImportLogsTest(unittest.TestCase):
 
     def test_control_message_payload_is_redacted(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
+            result = import_log(
+                FIXTURES / "mavlink_command_sample.csv",
+                sessions_dir=Path(tmp),
+                source_id="mavlink",
+            )
+            events = load_jsonl(result.output_path)
+            sample = next(event for event in events if event.get("event") == "sample")
+
+            self.assertEqual(sample["message_type"], "COMMAND_LONG")
+            self.assertTrue(sample["control_payload_redacted"])
+            self.assertNotIn("command", sample.get("telemetry", {}))
+            self.assertNotIn("param1", sample.get("telemetry", {}))
+
+
+if __name__ == "__main__":
+    unittest.main()
+
