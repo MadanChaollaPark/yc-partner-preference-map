@@ -162,3 +162,58 @@ class PassiveSourceAdapter:
         )
 
     @property
+    def adapter_id(self) -> str:
+        return "{0}.{1}".format(self.__module__, self.__class__.__name__)
+
+    def _iter_regular_files(self, root: Path, warnings: List[str]) -> Iterator[Path]:
+        if root.is_dir():
+            for dirpath, dirnames, filenames in os.walk(
+                str(root), topdown=True, followlinks=False
+            ):
+                dirnames[:] = sorted(dirnames)
+                for filename in sorted(filenames):
+                    candidate = Path(dirpath) / filename
+                    if _is_regular_file(candidate, warnings):
+                        yield candidate
+            return
+
+        if _is_regular_file(root, warnings):
+            yield root
+
+    def _event_for_file(
+        self, path: Path, root: Path, classification: Dict[str, Any]
+    ) -> EventDict:
+        file_stat = path.stat()
+        size_bytes = file_stat.st_size
+        sha256 = _sha256_file(path)
+        relative_path = _relative_to(path, root)
+
+        metadata: Dict[str, Any] = {
+            "adapter": self.adapter_id,
+            "source_display_name": self.display_name,
+            "scan_mode": "imported_exported_log_scan",
+            "passive_only": True,
+            "live_capture_supported": False,
+        }
+        metadata.update(self.source_metadata)
+
+        return {
+            "schema": "passive_recorder.source_artifact.v1",
+            "event_type": "source_artifact_discovered",
+            "source": {
+                "name": self.name,
+                "display_name": self.display_name,
+                "mode": "imported_exported_logs",
+            },
+            "artifact": {
+                "path": str(path),
+                "relative_path": relative_path,
+                "filename": path.name,
+                "extension": path.suffix.lower(),
+                "size_bytes": size_bytes,
+                "sha256": sha256,
+                "modified_time": _format_timestamp(file_stat.st_mtime),
+            },
+            "classification": classification,
+            "metadata": metadata,
+        }
