@@ -50,3 +50,54 @@ Why this is third:
 
 - Autel enterprise aircraft appear in inspection, security, and field operations.
 - Smart-controller exports can provide a controlled endpoint-side intake path.
+- Platform coverage broadens the recorder beyond DJI without adding active behavior.
+
+Importer work should start with known exported app/controller files and clear provenance fields.
+
+### 4. Fixed-Wing and Larger Recon Drones
+
+Target systems:
+
+- ArduPilot.
+- PX4.
+- Pixhawk, Cube, Matek, and CUAV-class flight controllers.
+
+Why this is fourth:
+
+- ArduPilot and PX4 ecosystems have mature flight logs and are common on larger airframes.
+- Removable-media or endpoint-copied logs fit the passive recorder model.
+- Log formats can support deeper maintenance and incident analysis once schemas mature.
+
+Importer work should prioritize copied log files, metadata extraction, and durable links between logs, airframes, and operator-provided session records.
+
+### 5. Fiber-Optic FPV
+
+Target artifacts:
+
+- Flight-controller logs available from the endpoint.
+- DVR/video files.
+- Operator-provided session metadata.
+
+Why this is fifth:
+
+- The recorder cannot rely on link-side visibility and should not attempt to inspect, interfere with, or characterize the physical link.
+- Practical coverage comes from endpoint records only.
+- Video and session metadata may be the primary review sources.
+
+Importer work should explicitly model gaps and uncertainty rather than inventing unavailable telemetry.
+
+## Cross-Platform Metadata
+
+The common record model should capture:
+
+- Artifact type and source platform.
+- Import time and original file timestamps.
+- Operator or organization that supplied the artifact.
+- Ownership or authorization basis.
+- Original path, content hash, and immutable source reference.
+- Parsed metadata confidence and parse warnings.
+- Links between flight records, controller logs, FC logs, video, and notes.
+
+## Research Guardrails
+
+Research must remain documentation and schema focused. Do not include instructions for RF interception, proprietary-link bypass, jamming, spoofing, replay, targeting, battlefield collection, or unauthorized acquisition. When a platform does not provide an exported artifact, document the limitation and leave the feature unsupported.
