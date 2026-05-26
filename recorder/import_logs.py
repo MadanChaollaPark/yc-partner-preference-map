@@ -95,3 +95,51 @@ def import_log(
 
     sessions_dir.mkdir(parents=True, exist_ok=True)
     output_path = sessions_dir / imported_session_filename(imported_at, source.id, input_path.stem)
+    write_jsonl(output_path, events)
+    return ImportResult(
+        output_path=output_path,
+        raw_archive_path=raw_archive_path,
+        source_id=source.id,
+        source_sha256=source_hash,
+        event_count=len(events),
+        sample_count=len(samples),
+        decode_status=decode_status,
+    )
+
+
+def decode_log(input_path: Path) -> tuple[list[dict[str, Any]], str]:
+    suffix = input_path.suffix.lower()
+    if suffix == ".csv":
+        return decode_csv(input_path), "decoded"
+    if suffix in {".jsonl", ".ndjson"}:
+        return decode_jsonl(input_path), "decoded"
+    if suffix in {".json", ".gutma"}:
+        return decode_json(input_path), "decoded"
+    if suffix == ".txt":
+        try:
+            return decode_csv(input_path), "decoded"
+        except csv.Error:
+            return raw_only_samples(input_path, "text log is archived without a native parser"), "raw_only"
+    if suffix in BINARY_SUFFIXES:
+        return raw_only_samples(input_path, "binary log is archived for approved offline decoding"), "raw_only"
+    return raw_only_samples(input_path, f"unsupported log suffix: {suffix or '<none>'}"), "raw_only"
+
+
+def decode_csv(input_path: Path) -> list[dict[str, Any]]:
+    text = input_path.read_text(encoding="utf-8-sig")
+    sample = text[:2048]
+    dialect = csv.Sniffer().sniff(sample) if "," not in sample[:200] and "\t" in sample[:200] else csv.excel
+    reader = csv.DictReader(io.StringIO(text), dialect=dialect)
+    if not reader.fieldnames:
+        raise csv.Error(f"no CSV header found in {input_path}")
+    return [
+        normalize_record(row, row_index=index)
+        for index, row in enumerate(reader, start=1)
+        if any(str(value).strip() for value in row.values() if value is not None)
+    ]
+
+
+def decode_jsonl(input_path: Path) -> list[dict[str, Any]]:
+    samples: list[dict[str, Any]] = []
+    with input_path.open("r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
