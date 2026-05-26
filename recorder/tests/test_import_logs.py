@@ -51,3 +51,21 @@ class ImportLogsTest(unittest.TestCase):
             sample_rows = [row for row in rows if row["event"] == "sample"]
             self.assertEqual(sample_rows[0]["link.rssi"], "87")
             self.assertEqual(sample_rows[0]["power.receiver_voltage_v"], "5.1")
+            self.assertEqual(sample_rows[0]["gnss.lon_deg"], "-122.0840575")
+
+    def test_import_existing_controller_jsonl(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            result = import_log(
+                FIXTURES / "sample_session.jsonl",
+                sessions_dir=Path(tmp),
+                source_id="generic",
+            )
+            events = load_jsonl(result.output_path)
+            samples = [event for event in events if event.get("event") == "sample"]
+
+            self.assertEqual(len(samples), 2)
+            self.assertEqual(samples[0]["controller"]["axes"]["rt"], 0.64)
+            self.assertTrue(samples[0]["controller"]["buttons"]["a"])
+
+    def test_control_message_payload_is_redacted(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
