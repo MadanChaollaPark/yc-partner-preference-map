@@ -1,0 +1,2 @@
+timestamp,message_type,command,param1
+2026-05-26T10:00:00Z,COMMAND_LONG,999,42
