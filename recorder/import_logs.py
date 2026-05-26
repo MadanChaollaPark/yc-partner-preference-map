@@ -385,3 +385,51 @@ def session_start_event(
             "sha256": source_hash,
             "decode_status": decode_status,
             "raw_archived_as": str(raw_archive_path) if raw_archive_path else None,
+        },
+    }
+    if note:
+        event["note"] = note
+    return event
+
+
+def extract_t_ms(record: dict[str, Any]) -> int | None:
+    for key in ("t_ms", "time_ms", "timestamp_ms", "elapsed_ms", "millis"):
+        value = record.get(key)
+        parsed = parse_scalar(value)
+        if isinstance(parsed, (int, float)):
+            return max(0, round(float(parsed)))
+    for key in ("time_s", "elapsed_s", "seconds"):
+        value = record.get(key)
+        parsed = parse_scalar(value)
+        if isinstance(parsed, (int, float)):
+            return max(0, round(float(parsed) * 1000))
+    return None
+
+
+def extract_timestamp(record: dict[str, Any]) -> str | None:
+    for key in ("timestamp", "datetime", "date_time", "time_utc", "utc"):
+        value = record.get(key)
+        parsed = parse_datetime(value)
+        if parsed:
+            return parsed
+
+    date_value = record.get("Date") or record.get("date")
+    time_value = record.get("Time") or record.get("time")
+    if date_value and time_value:
+        parsed = parse_datetime(f"{date_value} {time_value}")
+        if parsed:
+            return parsed
+    return None
+
+
+def extract_message_type(record: dict[str, Any]) -> str | None:
+    for key in ("message_type", "mavlink_message", "msg_type", "type"):
+        value = record.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip().upper()
+    return None
+
+
+def parse_datetime(value: Any) -> str | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
