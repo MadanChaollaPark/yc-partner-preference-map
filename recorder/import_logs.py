@@ -192,3 +192,51 @@ def normalize_record(record: dict[str, Any], row_index: int) -> dict[str, Any]:
             "source_row": row_index,
             "message_type": message_type,
             "control_payload_redacted": True,
+        }
+        if t_ms is not None:
+            sample["t_ms"] = t_ms
+        if timestamp:
+            sample["timestamp"] = timestamp
+        return sample
+
+    if event_name in {"session_start", "session_end"}:
+        return {
+            "event": "source_event",
+            "source_row": row_index,
+            "source_event": event_name,
+            "t_ms": t_ms or 0,
+        }
+    if event_name not in {"sample", "input"} and not has_sample_payload(record):
+        return {
+            "event": "source_event",
+            "source_row": row_index,
+            "source_event": event_name,
+            "t_ms": t_ms or 0,
+        }
+
+    sample = {
+        "event": "sample",
+        "source_row": row_index,
+    }
+    if t_ms is not None:
+        sample["t_ms"] = t_ms
+    if timestamp:
+        sample["timestamp"] = timestamp
+    if event_name not in {"sample", "input"}:
+        sample["source_event"] = event_name
+    if message_type:
+        sample["message_type"] = message_type
+
+    copy_nested(record, sample)
+    for raw_key, raw_value in record.items():
+        key = normalize_key(str(raw_key))
+        if should_skip_key(key):
+            continue
+        value = parse_scalar(raw_value)
+        if value is None:
+            continue
+        assign_known_field(sample, key, value)
+
+    return sample
+
+
