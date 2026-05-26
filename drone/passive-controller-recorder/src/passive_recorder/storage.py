@@ -82,3 +82,45 @@ def import_source(
     session_dir: Path,
     input_path: Path,
     *,
+    source_type: str,
+    copy_raw: bool = False,
+) -> list[dict[str, Any]]:
+    if source_type not in SUPPORTED_SOURCE_TYPES:
+        raise PassiveRecorderError(f"Unsupported source_type: {source_type}")
+    manifest = load_manifest(session_dir)
+    input_path = input_path.expanduser().resolve()
+
+    events = _adapter_events(
+        input_path,
+        source_type=source_type,
+        session_id=manifest["session_id"],
+    )
+    if events is None:
+        events = _generic_artifact_events(
+            input_path,
+            source_type=source_type,
+            session_id=manifest["session_id"],
+        )
+
+    if copy_raw:
+        copied = _copy_raw_artifacts(session_dir, input_path)
+        manifest.setdefault("artifacts", []).extend(copied)
+    else:
+        manifest.setdefault("artifacts", []).extend(_artifact_summaries_from_events(events))
+
+    append_events(session_dir, events)
+    save_manifest(session_dir, manifest)
+    return events
+
+
+def _adapter_events(input_path: Path, *, source_type: str, session_id: str) -> list[dict[str, Any]] | None:
+    try:
+        from .sources import get_adapter
+    except ImportError:
+        return None
+
+    try:
+        adapter = get_adapter(source_type)
+    except (KeyError, PassiveRecorderError):
+        return None
+    result = adapter.scan(input_path)
