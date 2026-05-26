@@ -482,3 +482,51 @@ def normalize_key(key: str) -> str:
 def should_skip_key(key: str) -> bool:
     return key in {
         "",
+        "event",
+        "type",
+        "timestamp",
+        "datetime",
+        "date_time",
+        "time_utc",
+        "utc",
+        "date",
+        "time",
+        "t_ms",
+        "time_ms",
+        "timestamp_ms",
+        "elapsed_ms",
+        "millis",
+        "time_s",
+        "elapsed_s",
+        "seconds",
+        "message_type",
+        "mavlink_message",
+        "msg_type",
+        "axes",
+        "buttons",
+        "hats",
+        "gnss",
+        "attitude",
+        "power",
+        "link",
+        "telemetry",
+    }
+
+
+def archive_raw_file(input_path: Path, sessions_dir: Path, source_hash: str) -> Path:
+    archive_dir = sessions_dir / RAW_ARCHIVE_DIR
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    safe_name = sanitize_stem(input_path.stem)
+    target = archive_dir / f"{source_hash[:16]}-{safe_name}{input_path.suffix.lower()}"
+    if not target.exists():
+        shutil.copy2(input_path, target)
+    return target
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
