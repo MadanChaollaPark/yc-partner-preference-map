@@ -143,3 +143,52 @@ def decode_jsonl(input_path: Path) -> list[dict[str, Any]]:
     samples: list[dict[str, Any]] = []
     with input_path.open("r", encoding="utf-8") as handle:
         for line_number, line in enumerate(handle, start=1):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            try:
+                record = json.loads(stripped)
+            except json.JSONDecodeError:
+                samples.append(
+                    {
+                        "event": "source_error",
+                        "source_row": line_number,
+                        "error": "invalid_json_line",
+                        "t_ms": 0,
+                    }
+                )
+                continue
+            if isinstance(record, dict):
+                samples.append(normalize_record(record, row_index=line_number))
+    return samples
+
+
+def decode_json(input_path: Path) -> list[dict[str, Any]]:
+    payload = json.loads(input_path.read_text(encoding="utf-8"))
+    if isinstance(payload, list):
+        records = payload
+    elif isinstance(payload, dict):
+        events = payload.get("events") or payload.get("samples") or payload.get("records")
+        records = events if isinstance(events, list) else [payload]
+    else:
+        records = []
+
+    return [
+        normalize_record(record, row_index=index)
+        for index, record in enumerate(records, start=1)
+        if isinstance(record, dict)
+    ]
+
+
+def normalize_record(record: dict[str, Any], row_index: int) -> dict[str, Any]:
+    event_name = str(record.get("event") or record.get("type") or "sample")
+    t_ms = extract_t_ms(record)
+    timestamp = extract_timestamp(record)
+    message_type = extract_message_type(record)
+
+    if message_type in CONTROL_MESSAGE_TYPES:
+        sample: dict[str, Any] = {
+            "event": "sample",
+            "source_row": row_index,
+            "message_type": message_type,
+            "control_payload_redacted": True,
