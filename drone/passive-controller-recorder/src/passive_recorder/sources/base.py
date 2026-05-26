@@ -108,3 +108,57 @@ class PassiveSourceAdapter:
 
     name = "unknown"
     display_name = "Unknown"
+    artifact_rules: Sequence[ArtifactRule] = ()
+    source_metadata: Dict[str, Any] = {}
+
+    def scan(self, path: object) -> AdapterResult:
+        root = Path(path).expanduser()
+        warnings: List[str] = []
+        events: List[EventDict] = []
+
+        if not root.exists():
+            warnings.append("Path does not exist: {0}".format(root))
+            return self._result(root, events, warnings)
+
+        for candidate in self._iter_regular_files(root, warnings):
+            classification = self.classify(candidate)
+            if classification is None:
+                continue
+
+            try:
+                event = self._event_for_file(candidate, root, classification)
+            except OSError as exc:
+                warnings.append("Could not read {0}: {1}".format(candidate, exc))
+                continue
+            events.append(event)
+
+        events.sort(key=lambda event: event["artifact"]["path"])
+        return self._result(root, events, warnings)
+
+    def iter_events(self, path: object) -> Iterator[EventDict]:
+        return iter(self.scan(path).events)
+
+    def classify(self, path: Path) -> Optional[Dict[str, Any]]:
+        for rule in self.artifact_rules:
+            classification = rule.classify(path)
+            if classification is not None:
+                return classification
+        return None
+
+    def _result(
+        self, root: Path, events: List[EventDict], warnings: List[str]
+    ) -> AdapterResult:
+        return AdapterResult(
+            source=self.name,
+            path=str(root),
+            events=events,
+            warnings=warnings,
+            metadata={
+                "adapter": self.adapter_id,
+                "display_name": self.display_name,
+                "mode": "imported_exported_log_scan",
+                "live_capture_supported": False,
+            },
+        )
+
+    @property
