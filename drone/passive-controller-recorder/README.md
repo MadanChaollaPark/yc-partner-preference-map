@@ -33,3 +33,38 @@ See [docs/safety.md](docs/safety.md) for the project boundaries.
 5. Review normalized records and provenance metadata.
 6. Keep originals immutable and store generated outputs separately.
 
+```sh
+python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -e ".[dev]"
+
+passive-recorder init ./sessions/test-dji \
+  --platform-family dji_mavic_matrice \
+  --controller-stack "DJI RC / DJI app exported FlightRecord" \
+  --authorization-basis "Operator-owned controller export"
+
+passive-recorder import ./sessions/test-dji \
+  --source-type dji \
+  --input /path/to/owned/DJI/FlightRecord
+
+passive-recorder list-adapters
+passive-recorder show ./sessions/test-dji
+```
+
+The importer hashes and indexes artifacts by default. It does not copy raw files into the session unless `--copy-raw` is explicitly supplied.
+
+Expected input classes:
+
+- DJI app/controller FlightRecord exports and related controller-side artifacts.
+- Betaflight blackbox logs, EdgeTX radio logs, DVR/video files, and operator session metadata.
+- Autel Enterprise/App exports and Smart Controller V3 owned logs.
+- ArduPilot/PX4 logs copied from Pixhawk/Cube/Matek/CUAV-class systems.
+- Fiber-optic FPV endpoint artifacts such as FC logs, DVR/video, and session metadata.
+
+## Supported Platforms Roadmap
+
+Priority 1: DJI Mavic/Matrice ecosystems using DJI RC, DJI RC Pro Enterprise, Smart Controller Enterprise, and exported DJI app/controller FlightRecord logs.
+
+Priority 2: FPV multirotors using Betaflight flight controllers, ELRS/CRSF/SBUS configurations, and EdgeTX radios such as RadioMaster-class transmitters. Collection remains limited to owned endpoint logs and exported files.
+
+Priority 3: Autel EVO Max 4T and similar enterprise aircraft using Autel Smart Controller V3 and Autel Enterprise/App logs.
