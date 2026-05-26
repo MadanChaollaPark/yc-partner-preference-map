@@ -18,8 +18,6 @@ export VEDAWIKI_SESSIONS_DIR="$(pwd)/sessions"
 API_PID=$!
 trap 'kill "$API_PID" 2>/dev/null || true' EXIT
 
-open "https://vedawiki.com/#dashboard" 2>/dev/null || true
-
 echo
 echo "Plug in an Xbox-compatible controller."
 echo "Logs will be written to: $VEDAWIKI_SESSIONS_DIR"

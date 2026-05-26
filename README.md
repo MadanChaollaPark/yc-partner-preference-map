@@ -2,11 +2,11 @@
 
 Vedawiki Field Recorder is an authorized controller-side telemetry recorder for
 training, debriefing, QA, and evaluation. The recorder of record is a native local
-Python process. The Vite/React app is only the replay and dashboard UI.
+Python process. The Vite/React app is the public download and instructions site.
 
 The prototype records Xbox-compatible controller input through `pygame`, writes
 append-only JSONL sessions, exposes those sessions through a local FastAPI server,
-and lets the dashboard replay/export them.
+and includes a manual CSV export tool for review workflows.
 
 ## Run The Native Recorder
 
@@ -41,24 +41,6 @@ Endpoints:
 - `GET /sessions/{name}`
 - `GET /sessions/{name}?format=jsonl`
 - `GET /sessions/{name}/csv`
-
-## Run The Dashboard
-
-In a third terminal:
-
-```sh
-npm install
-npm run dev
-```
-
-Open the Vite URL, usually `http://localhost:5173`, and use the Recorder Dashboard
-section. If the FastAPI server is not running, the dashboard shows a warning.
-
-To point the dashboard at a different recorder API:
-
-```sh
-VITE_RECORDER_API_URL=http://127.0.0.1:8000 npm run dev
-```
 
 ## Export CSV Manually
 

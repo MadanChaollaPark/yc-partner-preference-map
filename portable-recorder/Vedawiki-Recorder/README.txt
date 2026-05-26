@@ -24,7 +24,8 @@ Quick start
 4. Plug in the Xbox-compatible controller.
 5. Keep the recorder terminal open while recording.
 6. Session files appear in sessions/.
-7. Open https://vedawiki.com/#dashboard to replay sessions and export CSV.
+7. Keep raw JSONL files in sessions/ and export CSV files when needed with
+   recorder/export_csv.py.
 
 Requirements
 ------------

@@ -23,7 +23,6 @@ if errorlevel 1 goto dependency_error
 
 set "VEDAWIKI_SESSIONS_DIR=%CD%\sessions"
 start "Vedawiki Recorder API" "%CD%\start-api-windows.bat"
-start "" "https://vedawiki.com/#dashboard"
 
 echo.
 echo Plug in an Xbox-compatible controller.

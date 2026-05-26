@@ -14,12 +14,10 @@ import {
   Mail,
   Plug,
   Radio,
-  Server,
   ShieldCheck,
   Usb,
 } from 'lucide-react'
 import './App.css'
-import { RecorderDashboard } from './RecorderDashboard'
 
 const RECORDER_DOWNLOAD_PATH = '/downloads/VedawikiFieldRecorder.zip'
 
@@ -77,7 +75,7 @@ const downloadItems = [
   'Portable USB app archive',
   'Windows and macOS start scripts',
   'Native Python controller recorder',
-  'Local dashboard API and CSV export',
+  'Structured JSONL logs and CSV export tooling',
 ]
 
 const useCases: IconCard[] = [
@@ -130,14 +128,14 @@ const pilotSteps = [
   {
     label: '03',
     title: 'Review sessions',
-    text: 'Open the dashboard, replay JSONL sessions, and export CSV files for approved review workflows.',
+    text: 'Review JSONL session files and export CSV files for approved debrief or QA workflows.',
   },
 ]
 
 const recorderFacts = [
   { label: 'Recorder', value: 'Native Python process' },
   { label: 'Data', value: 'Append-only JSONL' },
-  { label: 'Dashboard', value: 'Local replay and export' },
+  { label: 'Review', value: 'Offline files and CSV export' },
 ]
 
 function App() {
@@ -183,12 +181,8 @@ function App() {
             QA, and evaluation programs.
           </p>
           <div className="hero-actions">
-            <a className="button primary" href="#dashboard">
-              <Server size={18} aria-hidden="true" />
-              Open recorder dashboard
-            </a>
             <a
-              className="button secondary"
+              className="button primary"
               href={RECORDER_DOWNLOAD_PATH}
               download
             >
@@ -213,8 +207,6 @@ function App() {
           </dl>
         </div>
       </section>
-
-      <RecorderDashboard />
 
       <section className="download-band" id="download" aria-labelledby="download-title">
         <div className="section-copy">
@@ -264,13 +256,13 @@ function App() {
             <ArrowRight className="flow-arrow" size={26} aria-hidden="true" />
             <SystemNode icon={<Usb size={22} />} title="Native recorder" text="pygame polling and JSONL logs" />
             <ArrowRight className="flow-arrow" size={26} aria-hidden="true" />
-            <SystemNode icon={<Server size={22} />} title="Dashboard" text="Local FastAPI replay and CSV export" />
+            <SystemNode icon={<FileCheck2 size={22} />} title="Review package" text="Offline files and CSV export" />
           </div>
           <div className="work-copy">
             <p>
               The prototype records Xbox-compatible controller input and saves timestamped
-              event logs from a native local process. The browser is only the replay and
-              export UI; no browser permission step is required for the recorder path.
+              event logs from a native local process. The public site does not connect to
+              local devices or recorder services.
             </p>
             <div className="spec-list">
               <Spec icon={<Plug size={18} />} label="No drone modification required" />
@@ -366,7 +358,6 @@ function SiteHeader() {
         <span>Vedawiki</span>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="/#dashboard">Dashboard</a>
         <a href="/#download">Download</a>
         <a href="/instructions">Instructions</a>
         <a href="/#trust">Security</a>
@@ -396,9 +387,9 @@ function InstructionsPage() {
             <Download size={18} aria-hidden="true" />
             Download recorder ZIP
           </a>
-          <a className="button secondary" href="/#dashboard">
-            <Server size={18} aria-hidden="true" />
-            Open dashboard
+          <a className="button secondary" href="/#download">
+            <FileCheck2 size={18} aria-hidden="true" />
+            View kit contents
           </a>
         </div>
       </section>
@@ -445,8 +436,8 @@ function InstructionsPage() {
             <div>
               <h3>Review and export</h3>
               <p>
-                Open <code>https://vedawiki.com/#dashboard</code> to replay sessions from
-                the local API and export CSV files for approved debrief or QA workflows.
+                Keep the raw JSONL files in <code>sessions/</code>. Use the included export
+                tooling to produce CSV files for approved debrief or QA workflows.
               </p>
             </div>
           </li>
@@ -463,7 +454,7 @@ function InstructionsPage() {
             <h3>1. Portable USB app</h3>
             <p>
               Possible now. The USB drive contains the app, start scripts, recorder code,
-              sessions folder, and dashboard link. The user still starts the recorder.
+              sessions folder, and export tooling. The user still starts the recorder.
             </p>
           </article>
           <article>
