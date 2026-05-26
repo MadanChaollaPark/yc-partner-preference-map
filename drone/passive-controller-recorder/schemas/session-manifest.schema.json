@@ -81,3 +81,85 @@
         }
       }
     },
+    "time_sync": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "clock_source", "offset_ms"],
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "clock_source": {
+          "type": "string"
+        },
+        "offset_ms": {
+          "type": ["number", "null"]
+        }
+      }
+    },
+    "safety": {
+      "$ref": "#/$defs/safety_flags"
+    },
+    "notes": {
+      "type": ["string", "null"]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["path", "sha256", "size_bytes"],
+        "properties": {
+          "path": {
+            "type": ["string", "null"]
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256_or_null"
+          },
+          "size_bytes": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "copied_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "safety_flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "passive_only",
+        "no_transmit",
+        "no_rf_interception",
+        "owned_or_authorized_sources_only"
+      ],
+      "properties": {
+        "passive_only": {
+          "const": true
+        },
+        "no_transmit": {
+          "const": true
+        },
+        "no_rf_interception": {
+          "const": true
+        },
+        "owned_or_authorized_sources_only": {
+          "const": true
+        }
+      }
+    },
+    "sha256_or_null": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}
