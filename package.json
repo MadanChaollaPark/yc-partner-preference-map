@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "package:recorder": "node scripts/build-portable-recorder.mjs",
     "ingest": "node scripts/ingest-yc.mjs",
     "ingest:sample": "node scripts/ingest-yc.mjs --recent-batches --limit 500 --concurrency 12"
   },

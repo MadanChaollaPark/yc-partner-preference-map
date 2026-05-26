@@ -1,16 +1,19 @@
 Vedawiki Government Evaluation Kit
 Version: public manifest, May 2026
 
-Vedawiki builds a controller-side flight recorder for authorized government drone
-evaluation, training debriefs, and manufacturer QA programs.
+Vedawiki builds a passive controller-side and log-import flight recorder for
+authorized non-weaponized drone evaluation, training debriefs, and manufacturer
+QA programs.
 
 This public kit is a manifest, not an unrestricted operational binary. Signed
-tool builds and device images are released only to authorized government,
-military, or approved manufacturer contacts after onboarding.
+tool builds and device images are released only to authorized public-sector,
+research, or approved manufacturer contacts after onboarding.
 
 Current prototype
 - Records USB HID / Xbox-compatible gamepad input.
 - Saves timestamped controller events.
+- Imports approved passive CSV/JSON telemetry logs.
+- Lists supported source families through the local API.
 - Exports structured logs for review sessions.
 - Starts at the controller side so mixed fleets can be evaluated before each
   drone model has a deep telemetry integration.
@@ -18,6 +21,7 @@ Current prototype
 Evaluation package available after onboarding
 - Signed logger build.
 - Supported controller list.
+- Passive USB/import and read-only serial deployment plan.
 - Pilot deployment checklist.
 - Data handling and chain-of-custody worksheet.
 - Debrief viewer / API documentation.
@@ -26,12 +30,13 @@ Data posture
 - Explicit authorization required.
 - Local-first capture supported.
 - No informal mission scraping.
+- No protected-link decoding, firmware modification, or command injection.
 - Exports are intended for approved review, training, QA, or procurement
   evaluation workflows.
 
 Request access
 Email: contact@vedawiki.com
-Subject: Vedawiki government evaluation
+Subject: Vedawiki passive recorder evaluation
 
 Please include organization, role, intended evaluation use, country/program,
 controller models, and required security constraints.
