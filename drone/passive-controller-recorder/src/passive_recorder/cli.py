@@ -68,3 +68,38 @@ def _cmd_import(args: argparse.Namespace) -> int:
     events = import_source(
         args.session_dir,
         args.input,
+        source_type=args.source_type,
+        copy_raw=args.copy_raw,
+    )
+    print(json.dumps({"imported_events": len(events), "session_dir": str(args.session_dir)}, indent=2))
+    return 0
+
+
+def _cmd_show(args: argparse.Namespace) -> int:
+    print(json.dumps(load_manifest(args.session_dir), indent=2, sort_keys=True))
+    return 0
+
+
+def _cmd_list_adapters(args: argparse.Namespace) -> int:
+    try:
+        from .sources import list_adapters
+    except ImportError:
+        adapters = list(SUPPORTED_SOURCE_TYPES)
+    else:
+        adapters = list_adapters()
+    print(json.dumps({"adapters": adapters}, indent=2))
+    return 0
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    try:
+        return args.func(args)
+    except PassiveRecorderError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
