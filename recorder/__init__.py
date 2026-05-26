@@ -1,1 +1,1 @@
-"""Vedawiki native controller recorder utilities."""
+"""Vedawiki passive controller and telemetry recorder utilities."""
