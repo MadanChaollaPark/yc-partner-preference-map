@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.passive-controller-recorder.local/normalized-event.schema.json",
+  "title": "Passive Controller Recorder Event",
+  "description": "One JSONL event emitted from a passive imported/exported artifact scan.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "event_id",
+    "session_id",
+    "event_type",
+    "recorded_at",
+    "source_type",
+    "artifact",
+    "normalized",
+    "safety"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "pattern": "^event_[0-9a-f]{32}$"
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^session_[0-9a-f]{32}$"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["artifact_observed", "source_artifact_discovered"]
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": ["dji", "autel", "betaflight", "ardupilot", "px4", "generic"]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["path", "sha256", "size_bytes"],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "relative_path": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
