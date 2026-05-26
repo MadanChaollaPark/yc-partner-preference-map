@@ -433,3 +433,52 @@ def extract_message_type(record: dict[str, Any]) -> str | None:
 def parse_datetime(value: Any) -> str | None:
     if not isinstance(value, str) or not value.strip():
         return None
+    candidate = value.strip().replace("Z", "+00:00")
+    try:
+        parsed = datetime.fromisoformat(candidate)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc).isoformat()
+    except ValueError:
+        pass
+
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y/%m/%d %H:%M:%S", "%d-%m-%Y %H:%M:%S", "%m/%d/%Y %H:%M:%S"):
+        try:
+            parsed = datetime.strptime(value.strip(), fmt).replace(tzinfo=timezone.utc)
+            return parsed.isoformat()
+        except ValueError:
+            continue
+    return None
+
+
+def parse_scalar(value: Any) -> Any:
+    if isinstance(value, (int, float, bool)) or value is None:
+        return value
+    if isinstance(value, (list, dict)):
+        return value
+    text = str(value).strip()
+    if not text or text.lower() in {"nan", "null", "none"}:
+        return None
+    lower = text.lower()
+    if lower in {"true", "yes", "y"}:
+        return True
+    if lower in {"false", "no", "n"}:
+        return False
+    if re.fullmatch(r"[-+]?\d+", text):
+        return int(text)
+    if re.fullmatch(r"[-+]?(?:\d+\.\d*|\d*\.\d+)(?:e[-+]?\d+)?", text, flags=re.IGNORECASE):
+        return float(text)
+    return text
+
+
+def normalize_key(key: str) -> str:
+    normalized = key.strip().lower()
+    normalized = normalized.replace("%", "pct")
+    normalized = re.sub(r"\([^)]*\)", "", normalized)
+    normalized = re.sub(r"[^a-z0-9]+", "_", normalized)
+    return normalized.strip("_")
+
+
+def should_skip_key(key: str) -> bool:
+    return key in {
+        "",
