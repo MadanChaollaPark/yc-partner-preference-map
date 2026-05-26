@@ -54,3 +54,58 @@ def discover_adapters() -> Tuple[str, ...]:
 def get_adapters() -> Dict[str, PassiveSourceAdapter]:
     return dict(ADAPTERS)
 
+
+def get_adapter(name: str) -> Optional[PassiveSourceAdapter]:
+    normalized = name.lower().strip()
+    adapter = ADAPTERS.get(normalized)
+    if adapter is not None or normalized in FALLBACK_IMPORT_TYPES:
+        return adapter
+
+    return None
+
+
+def scan_source(name: str, path: object) -> AdapterResult:
+    adapter = get_adapter(name)
+    if adapter is None:
+        if name.lower().strip() in FALLBACK_IMPORT_TYPES:
+            raise KeyError(
+                "Source type {0!r} is handled by the generic artifact importer, "
+                "not a source-specific adapter.".format(name)
+            )
+        raise KeyError(
+            "Unknown source adapter {0!r}. Available adapters: {1}".format(
+                name, ", ".join(available_adapters())
+            )
+        )
+    return adapter.scan(path)
+
+
+def scan_all(path: object, names: Optional[Iterable[str]] = None) -> List[AdapterResult]:
+    selected = names if names is not None else ADAPTERS
+    results: List[AdapterResult] = []
+    for name in selected:
+        adapter = get_adapter(name)
+        if adapter is not None:
+            results.append(adapter.scan(path))
+    return results
+
+
+__all__ = [
+    "ADAPTERS",
+    "ADAPTER_CLASSES",
+    "AdapterResult",
+    "ArtifactRule",
+    "PassiveSourceAdapter",
+    "available_adapters",
+    "discover_adapters",
+    "get_adapter",
+    "get_adapters",
+    "list_adapters",
+    "scan_all",
+    "scan_source",
+    "ArduPilotAdapter",
+    "AutelAdapter",
+    "BetaflightAdapter",
+    "DJIAdapter",
+    "PX4Adapter",
+]
