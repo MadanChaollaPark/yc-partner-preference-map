@@ -166,3 +166,45 @@ def _copy_raw_artifacts(session_dir: Path, input_path: Path) -> list[dict[str, A
         shutil.copy2(file_path, destination)
         record = ArtifactRecord.from_path(
             destination,
+            source_type="raw_copy",
+            artifact_role="raw_copy",
+            parser="filesystem",
+        )
+        copied.append(
+            {
+                "path": str(destination.relative_to(session_dir)),
+                "sha256": record.sha256,
+                "size_bytes": record.size_bytes,
+                "copied_at": utc_now(),
+            }
+        )
+    return copied
+
+
+def _unique_destination(path: Path) -> Path:
+    if not path.exists():
+        return path
+    stem = path.stem
+    suffix = path.suffix
+    parent = path.parent
+    for index in range(1, 10_000):
+        candidate = parent / f"{stem}-{index}{suffix}"
+        if not candidate.exists():
+            return candidate
+    raise PassiveRecorderError(f"Could not create unique destination under {parent}")
+
+
+def _artifact_summaries_from_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    summaries: list[dict[str, Any]] = []
+    for event in events:
+        artifact = event.get("artifact")
+        if isinstance(artifact, dict):
+            summaries.append(
+                {
+                    "path": artifact.get("path"),
+                    "sha256": artifact.get("sha256"),
+                    "size_bytes": artifact.get("size_bytes"),
+                    "observed_at": event.get("recorded_at"),
+                }
+            )
+    return summaries
