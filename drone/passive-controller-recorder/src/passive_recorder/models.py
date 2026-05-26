@@ -114,3 +114,41 @@ class ArtifactRecord:
 
 def make_manifest(
     *,
+    platform_family: str,
+    controller_stack: str,
+    authorization_basis: str,
+    capture_mode: str,
+    notes: str | None = None,
+) -> dict[str, Any]:
+    if not authorization_basis.strip():
+        raise PassiveRecorderError("authorization_basis is required")
+    if capture_mode not in {
+        "exported_log_import",
+        "owned_endpoint_capture",
+        "manual_session_metadata",
+    }:
+        raise PassiveRecorderError(f"Unsupported capture_mode: {capture_mode}")
+
+    return {
+        "schema_version": "0.1.0",
+        "session_id": new_id("session"),
+        "created_at": utc_now(),
+        "platform_family": platform_family,
+        "controller_stack": controller_stack,
+        "authorization_basis": authorization_basis,
+        "capture_mode": capture_mode,
+        "redaction": {
+            "default": "redact_sensitive",
+            "redact_precise_location": True,
+            "redact_operator_identity": True,
+            "redact_unit_or_customer_identity": True,
+        },
+        "time_sync": {
+            "method": "unspecified",
+            "clock_source": "host_utc",
+            "offset_ms": None,
+        },
+        "safety": PASSIVE_SAFETY_FLAGS.copy(),
+        "notes": notes,
+        "artifacts": [],
+    }
