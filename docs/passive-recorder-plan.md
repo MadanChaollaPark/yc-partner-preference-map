@@ -28,3 +28,32 @@ read-only or fail-open.
      normalization.
 
 ## Source Priority
+
+| Priority | Ecosystem | Common Controllers / Stack | Safe Capture Mode |
+| --- | --- | --- | --- |
+| 1 | DJI | RC, RC 2, RC Pro, RC Pro Enterprise, RC Plus / Plus 2 | Official export, SDK, or cloud/API |
+| 2 | MAVLink / ArduPilot / PX4 | Mission Planner, QGroundControl, Pixhawk, CubePilot, Holybro, CUAV | USB import, SD-card import, read-only serial |
+| 3 | EdgeTX / ELRS / Crossfire | RadioMaster Boxer, TX16S, ExpressLRS, TBS Crossfire | SD-card CSV, approved telemetry export |
+| 4 | Betaflight / iNav | Blackbox-capable FPV controllers | Blackbox CSV/JSON import |
+| 5 | Skydio | X10 Controller, Flight Deck, Skydio Cloud | Official cloud/API export |
+| 6 | Autel | Smart Controller V3, EVO Max, Dragonfish, SkyCommand | Official log/cloud export |
+| 7 | Parrot | Skycontroller, FreeFlight, ANAFI Ai/USA | SDK, GUTMA, or log export |
+
+## Current Implementation
+
+- `recorder/sources.py` defines the source catalog and passive boundaries.
+- `recorder/import_logs.py` imports CSV, JSON, JSONL, NDJSON, and GUTMA-style JSON.
+- Binary logs such as `.tlog`, `.bin`, `.ulg`, and `.bbl` are registered as
+  raw-only until an approved decoder is added.
+- Command-style MAVLink records are redacted by default during normalization.
+- `GET /sources` exposes the source catalog to local tooling.
+
+## Next Hardware Milestones
+
+1. Bench prototype with USB-C power/export and microSD storage.
+2. Receive-only UART telemetry input with no TX pin populated.
+3. MAVLink simulator validation using ArduPilot SITL and PX4 SITL.
+4. Storage-full, power-loss, and timestamp-drift tests.
+5. Signed log manifest and tamper-evident enclosure.
+6. Field pilot with written authorization and non-weaponized test aircraft.
+
