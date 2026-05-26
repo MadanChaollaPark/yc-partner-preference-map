@@ -530,3 +530,51 @@ def sha256_file(path: Path) -> str:
             digest.update(chunk)
     return digest.hexdigest()
 
+
+def imported_session_filename(imported_at: datetime, source_id: str, stem: str) -> str:
+    timestamp = imported_at.strftime("%Y%m%dT%H%M%SZ")
+    return f"{timestamp}-{source_id}-{sanitize_stem(stem)}.jsonl"
+
+
+def sanitize_stem(stem: str) -> str:
+    safe = re.sub(r"[^a-zA-Z0-9]+", "-", stem).strip("-").lower()
+    return (safe[:48] or "log")
+
+
+def write_jsonl(path: Path, events: Iterable[dict[str, Any]]) -> None:
+    with path.open("w", encoding="utf-8") as handle:
+        for event in events:
+            handle.write(json.dumps(event, separators=(",", ":"), sort_keys=True) + "\n")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Import an authorized passive UAV/controller log into Vedawiki JSONL."
+    )
+    parser.add_argument("input", nargs="?", type=Path, help="CSV, JSON, JSONL, or raw log file to import")
+    parser.add_argument("--sessions-dir", type=Path, default=SESSIONS_DIR)
+    parser.add_argument("--source", default="auto", help="source id from --list-sources, or auto")
+    parser.add_argument("--archive-raw", action="store_true", help="copy the original log into sessions/raw")
+    parser.add_argument("--note", help="custody or authorization note to include in the session start event")
+    parser.add_argument("--list-sources", action="store_true", help="print supported passive source catalog")
+    args = parser.parse_args()
+
+    if args.list_sources:
+        print(json.dumps(source_catalog(), indent=2))
+        return 0
+    if not args.input:
+        parser.error("input is required unless --list-sources is used")
+
+    result = import_log(
+        input_path=args.input,
+        sessions_dir=args.sessions_dir,
+        source_id=args.source,
+        archive_raw=args.archive_raw,
+        note=args.note,
+    )
+    print(json.dumps(result.to_dict(), indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
