@@ -120,3 +120,34 @@ SOURCE_CATALOG: tuple[RecorderSource, ...] = (
         ecosystem="Parrot ANAFI",
         priority=7,
         controller_examples=("Parrot Skycontroller", "FreeFlight", "ANAFI Ai", "ANAFI USA"),
+        capture_modes=("official-sdk-export", "gutma-import", "usb-log-import"),
+        import_patterns=("*.csv", "*.json", "*.jsonl", "*.gutma"),
+        implementation_status="CSV/JSON/GUTMA-style import now",
+        passive_boundary="Use Parrot SDK or exported flight logs; no controller modification.",
+        notes="GUTMA-style JSON exports are normalized as ordinary JSON records.",
+    ),
+    RecorderSource(
+        id="generic",
+        name="Generic passive CSV/JSON",
+        ecosystem="Authorized simulator or exported log",
+        priority=99,
+        controller_examples=("Simulator CSV", "Approved analytics export"),
+        capture_modes=("usb-log-import", "file-import"),
+        import_patterns=("*.csv", "*.json", "*.jsonl", "*.ndjson"),
+        implementation_status="CSV/JSON import now",
+        passive_boundary="File import only.",
+        notes="Use when the source is authorized but does not map cleanly to a named ecosystem.",
+    ),
+)
+
+
+def source_catalog() -> list[dict[str, Any]]:
+    return [source.to_dict() for source in sorted(SOURCE_CATALOG, key=lambda item: item.priority)]
+
+
+def get_source(source_id: str) -> RecorderSource:
+    normalized = source_id.strip().lower()
+    for source in SOURCE_CATALOG:
+        if source.id == normalized:
+            return source
+    raise KeyError(f"unknown recorder source: {source_id}")
