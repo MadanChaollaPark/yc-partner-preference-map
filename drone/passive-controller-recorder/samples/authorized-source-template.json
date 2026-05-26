@@ -72,3 +72,77 @@
     "firmware": {
       "controller_version": "0.0.0",
       "aircraft_version": "0.0.0",
+      "radio_version": "0.0.0"
+    },
+    "host_os": {
+      "name": "iOS, Android, Windows, macOS, or Linux",
+      "version": "0.0.0",
+      "device_model": "Controller or host model"
+    },
+    "interfaces": [
+      "local_storage"
+    ]
+  },
+  "redaction_defaults": {
+    "default_action": "redact",
+    "hash_algorithm": "sha256",
+    "hash_salt_id": "salt-rotation-2026-05",
+    "location_precision_meters": 100,
+    "time_precision": "second",
+    "retain_raw_artifacts": false,
+    "redact_fields": [
+      "operator_name",
+      "account_email",
+      "device_serial",
+      "precise_home_location",
+      "media_file_path"
+    ],
+    "retain_fields": [
+      "event_type",
+      "observed_at",
+      "platform_family",
+      "capture_mode"
+    ]
+  },
+  "raw_artifact_hashes": [
+    {
+      "artifact_id": "artifact-controller-export-001",
+      "source_id": "source-operator-controller-001",
+      "artifact_class": "controller_log_export",
+      "source_uri": "file://raw/controller-export.zip",
+      "media_type": "application/zip",
+      "size_bytes": 1048576,
+      "hash_algorithm": "sha256",
+      "hash_value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "created_at": "2026-05-26T11:45:00Z",
+      "collected_at": "2026-05-26T12:05:00Z",
+      "redaction_state": "raw"
+    }
+  ],
+  "time_sync_metadata": {
+    "reference_clock": {
+      "type": "utc_ntp",
+      "description": "Recorder host synchronized to UTC by NTP before collection."
+    },
+    "source_clock": {
+      "clock_id": "controller-local-clock",
+      "timezone": "UTC",
+      "original_timestamp_format": "epoch_ms"
+    },
+    "normalization": {
+      "offset_ms": 0,
+      "drift_ppm": 0,
+      "measured_at": "2026-05-26T12:00:00Z",
+      "method": "file_metadata",
+      "confidence": "medium"
+    },
+    "observations": [
+      {
+        "observed_at": "2026-05-26T12:00:00Z",
+        "source_timestamp": "1779796800000",
+        "reference_timestamp": "2026-05-26T12:00:00Z",
+        "offset_ms": 0
+      }
+    ]
+  }
+}
