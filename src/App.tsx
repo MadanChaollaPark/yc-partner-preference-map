@@ -21,6 +21,8 @@ import {
 import './App.css'
 import { RecorderDashboard } from './RecorderDashboard'
 
+const RECORDER_DOWNLOAD_PATH = '/downloads/VedawikiFieldRecorder.zip'
+
 type IconCard = {
   icon: ReactNode
   title: string
@@ -72,10 +74,10 @@ const heroOptions: HeroOption[] = [
 ]
 
 const downloadItems = [
-  'Public evaluation manifest',
-  'Controlled-build request path',
-  'Pilot deployment checklist',
-  'Data handling and authorization notes',
+  'Portable USB app archive',
+  'Windows and macOS start scripts',
+  'Native Python controller recorder',
+  'Local dashboard API and CSV export',
 ]
 
 const useCases: IconCard[] = [
@@ -117,18 +119,18 @@ const trustControls: IconCard[] = [
 const pilotSteps = [
   {
     label: '01',
-    title: 'Download the public kit',
-    text: 'Review the evaluation manifest, supported controller path, and data handling model.',
+    title: 'Download the portable app',
+    text: 'Unzip Vedawiki Field Recorder onto a USB drive or local working folder.',
   },
   {
     label: '02',
-    title: 'Request a signed build',
-    text: 'Government or authorized manufacturer contacts receive controlled binaries and onboarding materials.',
+    title: 'Start the recorder',
+    text: 'Run the Windows or macOS start file, then plug in the Xbox-compatible controller.',
   },
   {
     label: '03',
-    title: 'Run a bounded pilot',
-    text: 'Start with controller-side sessions, debrief reports, and manufacturer feedback loops before deeper integrations.',
+    title: 'Review sessions',
+    text: 'Open the dashboard, replay JSONL sessions, and export CSV files for approved review workflows.',
   },
 ]
 
@@ -139,6 +141,7 @@ const recorderFacts = [
 ]
 
 function App() {
+  const instructionsRoute = isInstructionsRoute()
   const [heroIndex, setHeroIndex] = useState(getInitialHeroIndex)
   const heroOption = heroOptions[heroIndex] ?? heroOptions[0]
 
@@ -155,28 +158,13 @@ function App() {
     return () => window.clearInterval(intervalId)
   }, [])
 
+  if (instructionsRoute) {
+    return <InstructionsPage />
+  }
+
   return (
     <main className="site-shell" id="top">
-      <header className="site-header">
-        <a className="brand" href="#top" aria-label="Vedawiki home">
-          <span className="brand-mark">V</span>
-          <span>Vedawiki</span>
-        </a>
-        <nav aria-label="Primary navigation">
-          <a href="#dashboard">Dashboard</a>
-          <a href="#download">Download</a>
-          <a href="#how">How it works</a>
-          <a href="#trust">Security</a>
-        </nav>
-        <a
-          className="header-action"
-          href="/downloads/vedawiki-government-evaluation-kit.txt"
-          download
-        >
-          <Download size={16} aria-hidden="true" />
-          Download kit
-        </a>
-      </header>
+      <SiteHeader />
 
       <section className="hero" aria-labelledby="hero-title">
         <img
@@ -201,11 +189,11 @@ function App() {
             </a>
             <a
               className="button secondary"
-              href="/downloads/vedawiki-government-evaluation-kit.txt"
+              href={RECORDER_DOWNLOAD_PATH}
               download
             >
               <Download size={18} aria-hidden="true" />
-              Download evaluation kit
+              Download recorder ZIP
             </a>
             <a
               className="button secondary"
@@ -243,7 +231,7 @@ function App() {
             <FileCheck2 size={22} aria-hidden="true" />
             <div>
               <strong>Vedawiki government evaluation kit</strong>
-              <span>Text manifest · public download</span>
+              <span>ZIP archive · portable recorder app</span>
             </div>
           </div>
           <ul>
@@ -256,11 +244,11 @@ function App() {
           </ul>
           <a
             className="button primary full"
-            href="/downloads/vedawiki-government-evaluation-kit.txt"
+            href={RECORDER_DOWNLOAD_PATH}
             download
           >
             <Download size={18} aria-hidden="true" />
-            Download kit
+            Download recorder ZIP
           </a>
         </div>
       </section>
@@ -346,11 +334,11 @@ function App() {
         <div className="closing-actions">
           <a
             className="button primary"
-            href="/downloads/vedawiki-government-evaluation-kit.txt"
+            href={RECORDER_DOWNLOAD_PATH}
             download
           >
             <Download size={18} aria-hidden="true" />
-            Download kit
+            Download recorder ZIP
           </a>
           <a
             className="button secondary"
@@ -368,6 +356,148 @@ function App() {
       </footer>
     </main>
   )
+}
+
+function SiteHeader() {
+  return (
+    <header className="site-header">
+      <a className="brand" href="/" aria-label="Vedawiki home">
+        <span className="brand-mark">V</span>
+        <span>Vedawiki</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/#dashboard">Dashboard</a>
+        <a href="/#download">Download</a>
+        <a href="/instructions">Instructions</a>
+        <a href="/#trust">Security</a>
+      </nav>
+      <a className="header-action" href={RECORDER_DOWNLOAD_PATH} download>
+        <Download size={16} aria-hidden="true" />
+        Download kit
+      </a>
+    </header>
+  )
+}
+
+function InstructionsPage() {
+  return (
+    <main className="site-shell">
+      <SiteHeader />
+      <section className="instructions-hero" aria-labelledby="instructions-title">
+        <p className="eyebrow">Start recorder</p>
+        <h1 id="instructions-title">Run Vedawiki from a USB drive.</h1>
+        <p>
+          A normal USB flash drive cannot record Xbox controller commands by itself.
+          Vedawiki’s downloadable version is a portable app that runs on the laptop or
+          ground station and writes sessions back to the USB drive.
+        </p>
+        <div className="hero-actions">
+          <a className="button primary" href={RECORDER_DOWNLOAD_PATH} download>
+            <Download size={18} aria-hidden="true" />
+            Download recorder ZIP
+          </a>
+          <a className="button secondary" href="/#dashboard">
+            <Server size={18} aria-hidden="true" />
+            Open dashboard
+          </a>
+        </div>
+      </section>
+
+      <section className="instructions-section" aria-labelledby="quick-start-title">
+        <div className="section-heading">
+          <p className="eyebrow">Quick start</p>
+          <h2 id="quick-start-title">Portable USB app workflow.</h2>
+        </div>
+        <ol className="instruction-steps">
+          <li>
+            <span>01</span>
+            <div>
+              <h3>Download and unzip</h3>
+              <p>
+                Download <code>VedawikiFieldRecorder.zip</code>, unzip it, and move the
+                <code> Vedawiki-Recorder</code> folder onto a USB drive or local working folder.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>02</span>
+            <div>
+              <h3>Start the recorder</h3>
+              <p>
+                On Windows, double-click <code>start-recorder-windows.bat</code>. On macOS,
+                double-click <code>start-recorder-mac.command</code>. The script creates a
+                local Python environment, installs dependencies, and starts the recorder API.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>03</span>
+            <div>
+              <h3>Plug in the controller</h3>
+              <p>
+                Connect an Xbox-compatible controller to the same laptop or ground station.
+                The recorder writes timestamped JSONL files into <code>sessions/</code>.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>04</span>
+            <div>
+              <h3>Review and export</h3>
+              <p>
+                Open <code>https://vedawiki.com/#dashboard</code> to replay sessions from
+                the local API and export CSV files for approved debrief or QA workflows.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section className="instructions-section split" aria-labelledby="versions-title">
+        <div>
+          <p className="eyebrow">What is possible</p>
+          <h2 id="versions-title">Three realistic recorder versions.</h2>
+        </div>
+        <div className="version-list">
+          <article>
+            <h3>1. Portable USB app</h3>
+            <p>
+              Possible now. The USB drive contains the app, start scripts, recorder code,
+              sessions folder, and dashboard link. The user still starts the recorder.
+            </p>
+          </article>
+          <article>
+            <h3>2. Portable executable</h3>
+            <p>
+              Better next step. Package the Python recorder with PyInstaller so users do
+              not install Python before recording sessions.
+            </p>
+          </article>
+          <article>
+            <h3>3. Inline USB hardware recorder</h3>
+            <p>
+              The real plug-and-record product. It requires custom hardware with USB host,
+              USB device, local storage, passthrough firmware, and latency testing.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="instructions-section warning-section">
+        <h2>What a flash drive cannot do</h2>
+        <p>
+          USB is not an audio splitter. A flash drive plugged into a computer cannot listen
+          to another USB port, and an Xbox controller usually cannot host or read a flash
+          drive. Something has to run recorder software or sit inline between the controller
+          and the host.
+        </p>
+      </section>
+    </main>
+  )
+}
+
+function isInstructionsRoute() {
+  return typeof window !== 'undefined' && window.location.pathname === '/instructions'
 }
 
 function getInitialHeroIndex() {

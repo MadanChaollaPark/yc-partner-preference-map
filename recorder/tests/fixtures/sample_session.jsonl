@@ -1,0 +1,5 @@
+{"event":"session_start","schema":"vedawiki.controller.v1","started_at":"2026-05-26T10:00:00+00:00","controller":{"id":"Xbox Wireless Controller","index":0,"instance_id":1,"xbox_compatible":true,"axes":6,"buttons":11,"hats":1},"record_only":true,"t_ms":0}
+{"event":"controller_connected","t_ms":1}
+{"event":"input","t_ms":124,"axes":{"lx":0.01,"ly":-0.42,"rx":0.0,"ry":0.03,"lt":0.0,"rt":0.64},"buttons":{"a":true,"b":false,"x":false,"y":false,"lb":false,"rb":true},"hats":[[0,0]],"raw_axes":[0.01,-0.42,0.0,0.03,0.0,0.64]}
+{"event":"input","t_ms":240,"axes":{"lx":0.0,"ly":0.0,"rx":0.34,"ry":-0.2,"lt":0.0,"rt":0.0},"buttons":{"a":false,"b":true,"x":false,"y":false,"lb":false,"rb":false},"hats":[[1,0]],"raw_axes":[0.0,0.0,0.34,-0.2,0.0,0.0]}
+{"event":"session_end","reason":"recorder_stopped","ended_at":"2026-05-26T10:00:05+00:00","t_ms":5000}

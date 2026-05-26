@@ -223,6 +223,7 @@
 
 .download-band,
 .dashboard-section,
+.instructions-section,
 .work-section,
 .use-section,
 .trust-section,
@@ -242,6 +243,8 @@
 
 .section-copy,
 .section-heading,
+.instructions-hero > *,
+.instructions-section > *,
 .work-grid,
 .dashboard-grid,
 .card-grid,
@@ -254,6 +257,8 @@
 
 .section-copy h2,
 .section-heading h2,
+.instructions-hero h1,
+.instructions-section h2,
 .closing-band h2 {
   color: var(--ink);
   font-size: clamp(32px, 4vw, 52px);
@@ -262,6 +267,8 @@
 
 .section-copy p,
 .section-heading p,
+.instructions-hero p,
+.instructions-section p,
 .work-copy p,
 .info-card p,
 .timeline-step p,
@@ -323,6 +330,110 @@
   gap: 9px;
   color: var(--ink);
   font-weight: 750;
+}
+
+.instructions-hero {
+  padding: 150px 34px 78px;
+  color: #fff;
+  background:
+    linear-gradient(90deg, rgba(20, 27, 24, 0.96), rgba(20, 27, 24, 0.78)),
+    url('/stock/war-drone-reaper-flight.jpg') center / cover;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.instructions-hero h1 {
+  max-width: 760px;
+  color: #fff;
+  line-height: 1;
+}
+
+.instructions-hero p {
+  max-width: 790px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 20px;
+}
+
+.instructions-section {
+  background: var(--page);
+  border-bottom: 1px solid var(--line);
+}
+
+.instructions-section.split {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+  gap: 36px;
+  align-items: start;
+}
+
+.instruction-steps,
+.version-list {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.instruction-steps {
+  margin-block: 0;
+}
+
+.instruction-steps li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.instruction-steps li > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  color: #17211d;
+  background: var(--signal);
+  font-weight: 950;
+}
+
+.instruction-steps h3,
+.version-list h3,
+.warning-section h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.instruction-steps p,
+.version-list p,
+.warning-section p {
+  margin: 8px 0 0;
+}
+
+.instruction-steps code,
+.warning-section code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(20, 27, 24, 0.08);
+  font-size: 0.92em;
+}
+
+.version-list article {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.warning-section {
+  background: #f7f4ec;
+}
+
+.warning-section p {
+  max-width: 900px;
+  font-size: 18px;
 }
 
 .dashboard-section {
@@ -886,6 +997,7 @@
   }
 
   .download-band,
+  .instructions-section.split,
   .work-grid,
   .dashboard-grid,
   .stick-replay,
@@ -969,6 +1081,8 @@
 
   .download-band,
   .dashboard-section,
+  .instructions-hero,
+  .instructions-section,
   .work-section,
   .use-section,
   .trust-section,
@@ -979,11 +1093,15 @@
 
   .section-copy h2,
   .section-heading h2,
+  .instructions-hero h1,
+  .instructions-section h2,
   .closing-band h2 {
     font-size: 32px;
   }
 
   .download-panel,
+  .instruction-steps li,
+  .version-list article,
   .session-panel,
   .replay-panel,
   .system-diagram,
