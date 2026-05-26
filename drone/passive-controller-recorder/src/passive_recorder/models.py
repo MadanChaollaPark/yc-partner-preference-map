@@ -37,3 +37,41 @@ def utc_now() -> str:
 
 def new_id(prefix: str) -> str:
     return f"{prefix}_{uuid.uuid4().hex}"
+
+
+def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(chunk_size), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def iter_files(path: Path) -> list[Path]:
+    if path.is_file():
+        return [path]
+    if path.is_dir():
+        return sorted(item for item in path.rglob("*") if item.is_file())
+    raise PassiveRecorderError(f"Input path does not exist: {path}")
+
+
+def guess_mime(path: Path) -> str:
+    return mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+
+
+@dataclass(frozen=True)
+class ArtifactRecord:
+    source_type: str
+    path: Path
+    sha256: str
+    size_bytes: int
+    mime_type: str
+    artifact_role: str = "raw_log"
+    parser: str = "generic"
+    notes: str | None = None
+
+    @classmethod
+    def from_path(
+        cls,
+        path: Path,
+        *,
