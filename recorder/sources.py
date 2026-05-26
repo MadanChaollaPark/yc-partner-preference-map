@@ -151,3 +151,33 @@ def get_source(source_id: str) -> RecorderSource:
         if source.id == normalized:
             return source
     raise KeyError(f"unknown recorder source: {source_id}")
+
+
+def detect_source(path: Path) -> RecorderSource:
+    filename = path.name.lower()
+    suffix = path.suffix.lower()
+
+    if suffix in {".tlog", ".bin", ".ulg"}:
+        return get_source("mavlink")
+    if suffix == ".bbl":
+        return get_source("blackbox")
+    if suffix == ".gutma":
+        return get_source("parrot")
+    if "edgetx" in filename or "opentx" in filename:
+        return get_source("edgetx")
+    if "qgroundcontrol" in filename or "missionplanner" in filename or "mavlink" in filename:
+        return get_source("mavlink")
+    if "dji" in filename:
+        return get_source("dji")
+    if "skydio" in filename:
+        return get_source("skydio")
+    if "autel" in filename:
+        return get_source("autel")
+    if "parrot" in filename or "anafi" in filename:
+        return get_source("parrot")
+
+    for source in SOURCE_CATALOG:
+        if any(fnmatch(filename, pattern.lower()) for pattern in source.import_patterns):
+            return source
+    return get_source("generic")
+
