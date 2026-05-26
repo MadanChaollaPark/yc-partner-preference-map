@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "passive-controller-recorder"
+version = "0.1.0"
+description = "Passive recorder for owned drone/controller logs and endpoint-side artifacts."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+  {name = "Passive Controller Recorder Maintainers"}
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8"
+]
+
+[project.scripts]
+passive-recorder = "passive_recorder.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
